@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<RootNamespace>PageKrafter</RootNamespace>
+		<Description>Document model, block registry, templates and HTML rendering for the PageKrafter page and email builder.</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Ardalis.Result" Version="10.1.0" />
+		<PackageReference Include="HtmlSanitizer" Version="9.2.1039" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.14" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="10.0.14" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="PageKrafter.Tests" />
+	</ItemGroup>
+
+</Project>

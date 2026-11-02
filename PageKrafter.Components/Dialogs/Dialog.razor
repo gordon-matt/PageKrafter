@@ -1,0 +1,16 @@
+@if (Open)
+{
+    <div class="pk-dialog-backdrop" @onclick="CloseAsync">
+        <div class="pk-dialog" role="dialog" aria-modal="true" aria-label="@Title" @onclick:stopPropagation="true" @onkeydown="OnKeyDownAsync">
+            <header class="pk-dialog-head">
+                <h2>@Title</h2>
+                <button type="button" class="pk-icon-btn" aria-label="Close" @onclick="CloseAsync">@Icons.X</button>
+            </header>
+            <div class="pk-dialog-body">@ChildContent</div>
+            @if (Footer is not null)
+            {
+                <footer class="pk-dialog-foot">@Footer</footer>
+            }
+        </div>
+    </div>
+}

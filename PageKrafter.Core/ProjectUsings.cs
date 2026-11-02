@@ -1,0 +1,9 @@
+global using System.Globalization;
+global using System.Text;
+global using Ardalis.Result;
+global using PageKrafter.Blocks;
+global using PageKrafter.Blocks.BuiltIn;
+global using PageKrafter.Documents;
+global using PageKrafter.Editing;
+global using PageKrafter.Rendering;
+global using PageKrafter.Templates;

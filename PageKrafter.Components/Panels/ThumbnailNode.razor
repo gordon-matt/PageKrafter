@@ -1,0 +1,50 @@
+@switch (Node.Type)
+{
+    case BlockTypes.Columns:
+        <div class="pk-thumb-row">
+            @foreach (var column in Columns)
+            {
+                <div class="pk-thumb-col" style="flex:@column.Ratio">
+                    @foreach (var child in column.Children.Take(MaxChildren))
+                    {
+                        <ThumbnailNode Node="child" Depth="Depth + 1" />
+                    }
+                </div>
+            }
+        </div>
+        break;
+    case BlockTypes.Heading:
+        <div class="pk-thumb-heading" style="@Align"></div>
+        break;
+    case BlockTypes.Text:
+        <div class="pk-thumb-text"></div>
+        <div class="pk-thumb-text pk-thumb-short"></div>
+        break;
+    case BlockTypes.Image:
+        <div class="pk-thumb-image"></div>
+        break;
+    case BlockTypes.Button:
+        <div class="pk-thumb-button-row" style="@Align"><span class="pk-thumb-button"></span></div>
+        break;
+    case BlockTypes.Spacer:
+        <div class="pk-thumb-space"></div>
+        break;
+    case BlockTypes.Divider:
+        <div class="pk-thumb-divider"></div>
+        break;
+    default:
+        @if (Children.Count > 0 && Depth < MaxDepth)
+        {
+            <div class="pk-thumb-band" style="@Band">
+                @foreach (var child in Children.Take(MaxChildren))
+                {
+                    <ThumbnailNode Node="child" Depth="Depth + 1" />
+                }
+            </div>
+        }
+        else
+        {
+            <div class="pk-thumb-other"></div>
+        }
+        break;
+}

@@ -1,0 +1,47 @@
+<div class="pk-panel">
+    <section class="pk-group">
+        <h3 class="pk-group-title">Sections</h3>
+        <p class="pk-hint">Drag onto the page, or click to add next to the selected block.</p>
+        @foreach (var group in Sections)
+        {
+            <h4 class="pk-subtitle" @key="group.Key">@group.Key</h4>
+            <div class="pk-template-grid">
+                @foreach (var template in group)
+                {
+                    <div class="pk-template" role="button" tabindex="0" draggable="true" title="@Tooltip(template)" data-pk-drag="@Payload(template)"
+                         @key="template.Id" @onclick="() => Editor.InsertTemplateAsync(template)" @onkeydown="args => OnKeyDownAsync(args, () => Editor.InsertTemplateAsync(template))">
+                        <TemplateThumbnail Template="template" />
+                        <span class="pk-template-name">@template.Name</span>
+                        @if (!template.IsReadOnly)
+                        {
+                            <button type="button" class="pk-template-delete" title="Delete template" aria-label="Delete @template.Name"
+                                    @onclick="() => Editor.DeleteTemplateAsync(template)" @onclick:stopPropagation="true">@Icons.X</button>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        <p class="pk-hint">To save your own, select a block and choose <strong>Save as template</strong>.</p>
+    </section>
+
+    <section class="pk-group">
+        <h3 class="pk-group-title">Pages</h3>
+        <p class="pk-hint">Replaces the whole page. You can undo this.</p>
+        <div class="pk-template-grid">
+            @foreach (var template in Pages)
+            {
+                <div class="pk-template" role="button" tabindex="0" title="@Tooltip(template)"
+                     @key="template.Id" @onclick="() => Editor.ApplyPageTemplateAsync(template)" @onkeydown="args => OnKeyDownAsync(args, () => Editor.ApplyPageTemplateAsync(template))">
+                    <TemplateThumbnail Template="template" />
+                    <span class="pk-template-name">@template.Name</span>
+                    @if (!template.IsReadOnly)
+                    {
+                        <button type="button" class="pk-template-delete" title="Delete template" aria-label="Delete @template.Name"
+                                @onclick="() => Editor.DeleteTemplateAsync(template)" @onclick:stopPropagation="true">@Icons.X</button>
+                    }
+                </div>
+            }
+        </div>
+        <button type="button" class="pk-btn pk-btn-block" @onclick="() => Editor.OpenSaveTemplate(TemplateKind.Page, null)">@Icons.Star<span>Save this page as a template</span></button>
+    </section>
+</div>

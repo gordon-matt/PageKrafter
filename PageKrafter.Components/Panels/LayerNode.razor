@@ -1,0 +1,41 @@
+<div class="pk-layer@(IsSelected ? " is-selected" : null)" role="treeitem" aria-selected="@(IsSelected ? "true" : "false")"
+     style="padding-left:@(Depth * 14 + 4)px" draggable="@(IsRoot ? "false" : "true")" data-pk-drag="@MovePayload" @onclick="SelectAsync">
+    @if (HasChildren)
+    {
+        <button type="button" class="pk-layer-toggle@(expanded ? " is-open" : null)" aria-label="@(expanded ? "Collapse" : "Expand")"
+                @onclick="Toggle" @onclick:stopPropagation="true">@Icons.Chevron</button>
+    }
+    else
+    {
+        <span class="pk-layer-toggle"></span>
+    }
+    <span class="pk-layer-icon">@((MarkupString)Icon)</span>
+    <span class="pk-layer-label">@Label</span>
+    @if (Summary.Length > 0)
+    {
+        <span class="pk-layer-summary">@Summary</span>
+    }
+    @if (!IsRoot)
+    {
+        <span class="pk-layer-actions">
+            <button type="button" class="pk-mini-btn" title="Move up" aria-label="Move up" @onclick='() => Editor.RunCommandAsync("up", Node.Id)' @onclick:stopPropagation="true">@Icons.Up</button>
+            <button type="button" class="pk-mini-btn" title="Move down" aria-label="Move down" @onclick='() => Editor.RunCommandAsync("down", Node.Id)' @onclick:stopPropagation="true">@Icons.Down</button>
+        </span>
+    }
+</div>
+
+@if (expanded)
+{
+    foreach (var slot in Slots)
+    {
+        if (Slots.Count > 1)
+        {
+            <div class="pk-layer-slot" style="padding-left:@((Depth + 1) * 14 + 24)px">@slot.Label</div>
+        }
+
+        foreach (var child in Node.ChildrenOf(slot.Name))
+        {
+            <LayerNode @key="child.Id" Editor="Editor" Node="child" Depth="Depth + 1" />
+        }
+    }
+}

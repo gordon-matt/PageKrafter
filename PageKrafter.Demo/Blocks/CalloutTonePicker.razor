@@ -1,0 +1,12 @@
+@inherits FieldEditorBase
+
+<div id="@InputId" class="tone-picker" role="radiogroup" aria-label="@Field.Label">
+    @foreach (var tone in CalloutBlock.Tones)
+    {
+        <button type="button" role="radio" aria-checked="@(tone.Key == Current ? "true" : "false")"
+                class="tone-option@(tone.Key == Current ? " is-active" : null)" style="--tone:@tone.Border;--tone-bg:@tone.Background"
+                @onclick="() => SetValueAsync(tone.Key)">
+            @tone.Label
+        </button>
+    }
+</div>

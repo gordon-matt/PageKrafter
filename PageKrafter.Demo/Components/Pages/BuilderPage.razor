@@ -1,0 +1,18 @@
+<div class="demo-head">
+    <div>
+        <h1>@Title</h1>
+        <p>@ChildContent</p>
+    </div>
+    <div class="demo-head-actions">
+        @if (status is not null)
+        {
+            <span class="demo-status" role="status">@status</span>
+        }
+        <a class="demo-link" href="preview/@Name" target="_blank">Open the saved @(Mode == DocumentMode.Email ? "email" : "page")</a>
+    </div>
+</div>
+
+@if (loaded)
+{
+    <PageKrafterEditor @bind-Value="json" Mode="Mode" OnSave="SaveAsync" Height="calc(100vh - 160px)" />
+}

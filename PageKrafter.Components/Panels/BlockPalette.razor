@@ -1,0 +1,27 @@
+<div class="pk-panel">
+    <input type="search" class="pk-input pk-search" placeholder="Search blocks" aria-label="Search blocks" @bind="search" @bind:event="oninput" />
+
+    @foreach (var group in Groups)
+    {
+        <section class="pk-group" @key="group.Key">
+            <h3 class="pk-group-title">@group.Key</h3>
+            <div class="pk-tiles">
+                @foreach (var block in group)
+                {
+                    <div class="pk-tile" role="button" tabindex="0" draggable="true" title="@Tooltip(block)" data-pk-drag="@Payload(block)"
+                         @key="block.Type" @onclick="() => Editor.InsertBlockAsync(block.Type)" @onkeydown="args => OnKeyDownAsync(args, block)">
+                        <span class="pk-tile-icon">@((MarkupString)block.Icon)</span>
+                        <span class="pk-tile-label">@block.Label</span>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Groups.Count == 0)
+    {
+        <p class="pk-empty">No blocks match "@search".</p>
+    }
+
+    <p class="pk-hint">Drag a block onto the page, or click it to add it next to the selected block.</p>
+</div>

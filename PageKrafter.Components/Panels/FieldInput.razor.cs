@@ -1,0 +1,89 @@
+using Microsoft.Extensions.Logging;
+
+namespace PageKrafter.Components.Panels;
+
+public partial class FieldInput
+{
+    private IReadOnlyList<FieldOption> loadedOptions = [];
+    private string? optionsKey;
+    private string? optionsError;
+
+    [Parameter, EditorRequired]
+    public PageKrafterEditor Editor { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public BlockNode Node { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public BlockDefinition Definition { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public BlockField Field { get; set; } = default!;
+
+    [Inject]
+    private ILogger<FieldInput> Logger { get; set; } = default!;
+
+    private string InputId => $"pk-{Node.Id}-{Field.Name}";
+
+    private string Current => Node.Get(Field.Name) ?? Field.DefaultValue;
+
+    private Type? CustomEditor => Editor.Settings.FieldEditorComponents.TryGetValue(Field.Editor, out var type) ? type : null;
+
+    private Dictionary<string, object?> CustomParameters => new()
+    {
+        [nameof(FieldEditorBase.Field)] = Field,
+        [nameof(FieldEditorBase.Node)] = Node,
+        [nameof(FieldEditorBase.Value)] = Current,
+        [nameof(FieldEditorBase.ValueChanged)] = EventCallback.Factory.Create<string>(this, SetAsync),
+    };
+
+    private IReadOnlyList<FieldOption> Options
+    {
+        get
+        {
+            var options = Field.HasDynamicOptions ? loadedOptions : Field.Options;
+            return Current.Length > 0 && options.All(option => option.Value != Current)
+                ? [.. options, new FieldOption(Current, $"{Current} (not in the list)")]
+                : options;
+        }
+    }
+
+    private string ColorSwatch => Current.Length == 7 && Current[0] == '#' ? Current : "#000000";
+
+    private string PreviewUrl => Html.SafeUrl(Current, allowDataImage: true);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Field.Editor != FieldEditors.Select || !Field.HasDynamicOptions)
+        {
+            return;
+        }
+
+        string key = string.Join('|', Field.OptionsDependOn.Select(name => Node.Get(name)).Prepend(Node.Id));
+        if (key == optionsKey)
+        {
+            return;
+        }
+
+        optionsKey = key;
+        try
+        {
+            loadedOptions = await Definition.GetOptionsAsync(Field, Node);
+            optionsError = null;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Logger.LogWarning(ex, "Options for {BlockType}.{FieldName} could not be loaded.", Definition.Type, Field.Name);
+            loadedOptions = [];
+            optionsError = "The options couldn't be loaded.";
+        }
+    }
+
+    private Task SetAsync(string value) => Editor.SetPropAsync(Node.Id, Field.Name, value);
+
+    private Task OnInputAsync(ChangeEventArgs args) => SetAsync(args.Value?.ToString() ?? string.Empty);
+
+    private Task OnChangeAsync(ChangeEventArgs args) => SetAsync(args.Value?.ToString() ?? string.Empty);
+
+    private Task OnCheckedAsync(ChangeEventArgs args) => SetAsync(args.Value is true ? "true" : "false");
+}

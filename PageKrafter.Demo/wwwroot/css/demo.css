@@ -1,0 +1,133 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #1f2937;
+    background: #f3f4f6;
+}
+
+.demo-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 0 20px;
+    height: 48px;
+    background: #111827;
+}
+
+.demo-brand {
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.demo-nav nav {
+    display: flex;
+    gap: 4px;
+}
+
+.demo-nav nav a {
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #d1d5db;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.demo-nav nav a:hover,
+.demo-nav nav a.active {
+    background: #374151;
+    color: #fff;
+}
+
+.demo-main {
+    padding: 12px 20px 20px;
+}
+
+.demo-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 12px;
+}
+
+.demo-head h1 {
+    margin: 0 0 4px;
+    font-size: 20px;
+}
+
+.demo-head h1:focus {
+    outline: none;
+}
+
+.demo-head p {
+    margin: 0;
+    max-width: 760px;
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.demo-head-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    white-space: nowrap;
+}
+
+.demo-status {
+    color: #15803d;
+    font-size: 13px;
+}
+
+.demo-link {
+    color: #2563eb;
+    font-size: 14px;
+}
+
+.demo-empty {
+    padding: 40px;
+    border: 1px dashed #9ca3af;
+    border-radius: 8px;
+    text-align: center;
+    color: #4b5563;
+}
+
+.demo-preview {
+    display: block;
+    width: 100%;
+    height: calc(100vh - 150px);
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.tone-picker {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.tone-option {
+    padding: 6px 8px;
+    border: 1px solid #d1d5db;
+    border-left: 4px solid var(--tone);
+    border-radius: 4px;
+    background: var(--tone-bg);
+    color: #1f2937;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.tone-option.is-active {
+    outline: 2px solid var(--tone);
+    outline-offset: 1px;
+}

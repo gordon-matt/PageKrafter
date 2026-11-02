@@ -1,0 +1,58 @@
+<div class="pk-panel pk-inspector">
+    @if (Node is null)
+    {
+        <div class="pk-empty-state">
+            <p>Select a block on the page to change its settings.</p>
+            <button type="button" class="pk-btn" @onclick="() => Editor.SelectAsync(Editor.Session.Document.Root.Id)">@Icons.Settings<span>Page settings</span></button>
+        </div>
+    }
+    else
+    {
+        <div class="pk-inspector-head">
+            <span class="pk-inspector-icon">@((MarkupString)(Definition?.Icon ?? BlockIcons.Square))</span>
+            <div class="pk-inspector-title">
+                <strong>@(Definition?.Label ?? Node.Type)</strong>
+                @if (Definition?.Description is { Length: > 0 } description)
+                {
+                    <small>@description</small>
+                }
+            </div>
+        </div>
+
+        @if (!IsRoot)
+        {
+            <div class="pk-inspector-actions" role="toolbar" aria-label="Block actions">
+                <button type="button" class="pk-icon-btn" title="Select parent (Esc)" aria-label="Select parent" @onclick='() => Editor.RunCommandAsync("parent", Node.Id)'>@Icons.Parent</button>
+                <button type="button" class="pk-icon-btn" title="Move up (Ctrl+↑)" aria-label="Move up" @onclick='() => Editor.RunCommandAsync("up", Node.Id)'>@Icons.Up</button>
+                <button type="button" class="pk-icon-btn" title="Move down (Ctrl+↓)" aria-label="Move down" @onclick='() => Editor.RunCommandAsync("down", Node.Id)'>@Icons.Down</button>
+                <button type="button" class="pk-icon-btn" title="Duplicate (Ctrl+D)" aria-label="Duplicate" @onclick='() => Editor.RunCommandAsync("duplicate", Node.Id)'>@Icons.Copy</button>
+                <button type="button" class="pk-icon-btn" title="Save as template" aria-label="Save as template" @onclick='() => Editor.RunCommandAsync("save-template", Node.Id)'>@Icons.Star</button>
+                <button type="button" class="pk-icon-btn pk-danger" title="Delete (Del)" aria-label="Delete" @onclick='() => Editor.RunCommandAsync("delete", Node.Id)'>@Icons.Trash</button>
+            </div>
+        }
+
+        @if (Definition is null)
+        {
+            <p class="pk-empty">This block type isn't registered, so it can't be edited. It is kept in the page.</p>
+        }
+        else
+        {
+            foreach (var group in Groups)
+            {
+                <details class="pk-group" open="@(group.Name != FieldGroups.Advanced)" @key="group.Name">
+                    <summary class="pk-group-title">@group.Name</summary>
+                    <div class="pk-fields">
+                        @if (group.UseCustomEditor)
+                        {
+                            <DynamicComponent Type="Definition.EditorComponent!" Parameters="CustomEditorParameters" />
+                        }
+                        @foreach (var field in group.Fields)
+                        {
+                            <FieldInput @key="Node.Id + field.Name" Editor="Editor" Node="Node" Definition="Definition" Field="field" />
+                        }
+                    </div>
+                </details>
+            }
+        }
+    }
+</div>

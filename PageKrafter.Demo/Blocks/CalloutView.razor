@@ -1,0 +1,6 @@
+@inherits BlockComponentBase
+
+<aside class="callout" role="note" style="@Style">
+    <strong style="display:block;margin-bottom:6px" @attributes="@(Editable("title"))">@Value("title")</strong>
+    <div @attributes="@(SlotAttributes())">@Slot()</div>
+</aside>

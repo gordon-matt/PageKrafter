@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<RootNamespace>PageKrafter.Components</RootNamespace>
+		<Description>Drag-and-drop page and email builder for Blazor Server, built on PageKrafter.Core.</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PageKrafter.Core\PageKrafter.Core.csproj" />
+	</ItemGroup>
+
+</Project>

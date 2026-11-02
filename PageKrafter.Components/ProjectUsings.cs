@@ -1,0 +1,9 @@
+global using Microsoft.AspNetCore.Components;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.JSInterop;
+global using PageKrafter.Blocks;
+global using PageKrafter.Blocks.BuiltIn;
+global using PageKrafter.Documents;
+global using PageKrafter.Editing;
+global using PageKrafter.Rendering;
+global using PageKrafter.Templates;

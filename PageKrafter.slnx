@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="PageKrafter.Core/PageKrafter.Core.csproj" />
+  <Project Path="PageKrafter.Components/PageKrafter.Components.csproj" />
+  <Project Path="PageKrafter.Tests/PageKrafter.Tests.csproj" />
+  <Project Path="PageKrafter.Demo/PageKrafter.Demo.csproj" />
+</Solution>

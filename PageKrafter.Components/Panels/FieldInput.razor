@@ -1,0 +1,82 @@
+<div class="pk-field">
+    @if (CustomEditor is not null)
+    {
+        <label class="pk-label" for="@InputId">@Field.Label</label>
+        <DynamicComponent Type="CustomEditor" Parameters="CustomParameters" />
+    }
+    else
+    {
+        switch (Field.Editor)
+        {
+            case FieldEditors.Checkbox:
+                <label class="pk-check">
+                    <input id="@InputId" type="checkbox" checked="@(Current == "true")" @onchange="OnCheckedAsync" />
+                    <span>@Field.Label</span>
+                </label>
+                break;
+
+            case FieldEditors.Select:
+                <label class="pk-label" for="@InputId">@Field.Label</label>
+                <select id="@InputId" class="pk-input" @onchange="OnChangeAsync">
+                    @foreach (var option in Options)
+                    {
+                        <option value="@option.Value" selected="@(option.Value == Current)">@option.Label</option>
+                    }
+                </select>
+                break;
+
+            case FieldEditors.Color:
+                <label class="pk-label" for="@InputId">@Field.Label</label>
+                <div class="pk-color">
+                    <span class="pk-swatch@(Current.Length == 0 ? " is-empty" : null)">
+                        <input type="color" aria-label="Pick @Field.Label" value="@ColorSwatch" @oninput="OnInputAsync" />
+                    </span>
+                    <input id="@InputId" class="pk-input" type="text" value="@Current" placeholder="@(Field.Placeholder ?? "None")" @oninput="OnInputAsync" />
+                    @if (Current.Length > 0)
+                    {
+                        <button type="button" class="pk-mini-btn" title="Clear" aria-label="Clear @Field.Label" @onclick='() => SetAsync(string.Empty)'>@Icons.X</button>
+                    }
+                </div>
+                break;
+
+            case FieldEditors.Number:
+                <label class="pk-label" for="@InputId">@Field.Label</label>
+                <input id="@InputId" class="pk-input" type="number" value="@Current" min="@Field.Min" max="@Field.Max" step="@Field.Step" @oninput="OnInputAsync" />
+                break;
+
+            case FieldEditors.TextArea:
+                <label class="pk-label" for="@InputId">@Field.Label</label>
+                <textarea id="@InputId" class="pk-input" rows="4" placeholder="@Field.Placeholder" @oninput="OnInputAsync">@Current</textarea>
+                break;
+
+            case FieldEditors.RichText:
+            case FieldEditors.Html:
+                <label class="pk-label" for="@InputId">@Field.Label</label>
+                <textarea id="@InputId" class="pk-input pk-code" rows="@(Field.Editor == FieldEditors.Html ? 10 : 6)" spellcheck="false" placeholder="@Field.Placeholder" @oninput="OnInputAsync">@Current</textarea>
+                break;
+
+            case FieldEditors.Image:
+                <label class="pk-label" for="@InputId">@Field.Label</label>
+                <input id="@InputId" class="pk-input" type="text" value="@Current" placeholder="@Field.Placeholder" @oninput="OnInputAsync" />
+                @if (PreviewUrl.Length > 0)
+                {
+                    <img class="pk-image-preview" src="@PreviewUrl" alt="" />
+                }
+                break;
+
+            default:
+                <label class="pk-label" for="@InputId">@Field.Label</label>
+                <input id="@InputId" class="pk-input" type="@(Field.Editor == FieldEditors.Url ? "url" : "text")" value="@Current" placeholder="@Field.Placeholder" @oninput="OnInputAsync" />
+                break;
+        }
+    }
+
+    @if (optionsError is not null)
+    {
+        <small class="pk-error">@optionsError</small>
+    }
+    else if (Field.HelpText is { Length: > 0 } help)
+    {
+        <small class="pk-help">@help</small>
+    }
+</div>

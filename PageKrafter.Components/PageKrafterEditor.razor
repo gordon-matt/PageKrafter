@@ -1,0 +1,72 @@
+@implements IAsyncDisposable
+
+<link rel="stylesheet" href="@CanvasDocument.StylesheetUrl" />
+<div class="pk-editor@(preview ? " is-preview" : null)" style="height:@Height" tabindex="-1" @ref="host">
+    <header class="pk-topbar">
+        <div class="pk-topbar-group">
+            <button type="button" class="pk-icon-btn" title="Undo (Ctrl+Z)" aria-label="Undo" disabled="@(!Session.CanUndo)" @onclick="UndoAsync">@Icons.Undo</button>
+            <button type="button" class="pk-icon-btn" title="Redo (Ctrl+Shift+Z)" aria-label="Redo" disabled="@(!Session.CanRedo)" @onclick="RedoAsync">@Icons.Redo</button>
+            <span class="pk-mode-badge">@(Session.Document.Mode == DocumentMode.Email ? "Email" : "Web page")</span>
+        </div>
+        <div class="pk-topbar-group" role="group" aria-label="Preview size">
+            @foreach (var option in Devices)
+            {
+                <button type="button" class="pk-icon-btn@(option == device ? " is-active" : null)" title="@option.Label" aria-label="@option.Label" aria-pressed="@(option == device ? "true" : "false")" @onclick="() => device = option">@option.Icon</button>
+            }
+        </div>
+        <div class="pk-topbar-group">
+            @ToolbarContent
+            <button type="button" class="pk-btn" @onclick="TogglePreviewAsync">@(preview ? Icons.Pencil : Icons.Eye)<span>@(preview ? "Edit" : "Preview")</span></button>
+            <button type="button" class="pk-btn" @onclick="ShowCodeAsync">@Icons.Code<span>HTML</span></button>
+            @if (OnSave.HasDelegate)
+            {
+                <button type="button" class="pk-btn pk-btn-primary" disabled="@saving" @onclick="SaveAsync">@(saving ? "Saving…" : "Save")</button>
+            }
+        </div>
+    </header>
+
+    <div class="pk-body">
+        <aside class="pk-sidebar pk-sidebar-left" aria-label="Blocks, templates and layers">
+            <div class="pk-tabs" role="tablist">
+                <button type="button" role="tab" class="pk-tab@(leftTab == LeftTab.Blocks ? " is-active" : null)" aria-selected="@(leftTab == LeftTab.Blocks ? "true" : "false")" @onclick="() => leftTab = LeftTab.Blocks">Blocks</button>
+                @if (ShowTemplates)
+                {
+                    <button type="button" role="tab" class="pk-tab@(leftTab == LeftTab.Templates ? " is-active" : null)" aria-selected="@(leftTab == LeftTab.Templates ? "true" : "false")" @onclick="() => leftTab = LeftTab.Templates">Templates</button>
+                }
+                <button type="button" role="tab" class="pk-tab@(leftTab == LeftTab.Layers ? " is-active" : null)" aria-selected="@(leftTab == LeftTab.Layers ? "true" : "false")" @onclick="() => leftTab = LeftTab.Layers">Layers</button>
+            </div>
+            <div class="pk-sidebar-content">
+                @switch (leftTab)
+                {
+                    case LeftTab.Templates when ShowTemplates:
+                        <TemplatePanel Editor="this" />
+                        break;
+                    case LeftTab.Layers:
+                        <LayersPanel Editor="this" />
+                        break;
+                    default:
+                        <BlockPalette Editor="this" />
+                        break;
+                }
+            </div>
+        </aside>
+
+        <main class="pk-stage">
+            <div class="pk-frame-wrap" style="width:@device.Width">
+                <iframe class="pk-frame" @ref="frame" title="Page canvas" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
+            </div>
+        </main>
+
+        <aside class="pk-sidebar pk-sidebar-right" aria-label="Block settings">
+            <Inspector Editor="this" />
+        </aside>
+    </div>
+
+    @if (toast is not null)
+    {
+        <div class="pk-toast" role="status">@toast</div>
+    }
+
+    <SaveTemplateDialog @ref="saveDialog" Editor="this" />
+    <CodeDialog @ref="codeDialog" Editor="this" />
+</div>

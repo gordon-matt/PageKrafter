@@ -1,0 +1,10 @@
+<div class="pk-thumb" aria-hidden="true">
+    @if (Rows.Count == 0)
+    {
+        <div class="pk-thumb-blank">Blank</div>
+    }
+    @foreach (var node in Rows)
+    {
+        <ThumbnailNode Node="node" Depth="0" />
+    }
+</div>

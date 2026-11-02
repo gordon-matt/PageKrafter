@@ -1,0 +1,193 @@
+html, body.pk-canvas {
+    min-height: 100%;
+}
+
+body.pk-canvas {
+    margin: 0;
+}
+
+#pk-canvas-root > [data-pk-root] {
+    display: flow-root;
+    box-sizing: border-box;
+    min-height: 100vh;
+}
+
+.pk-chrome {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 2147483000;
+    font: 600 11px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.pk-chrome [hidden] {
+    display: none !important;
+}
+
+.pk-hover-box,
+.pk-select-box,
+.pk-drop-zone {
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.pk-hover-box {
+    outline: 1px dashed #3b82f6;
+    outline-offset: -1px;
+}
+
+.pk-select-box {
+    outline: 2px solid #2563eb;
+    outline-offset: -2px;
+}
+
+.pk-badge {
+    position: absolute;
+    left: -1px;
+    top: -19px;
+    padding: 3px 6px;
+    border-radius: 3px 3px 0 0;
+    background: #3b82f6;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.pk-toolbar {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 2px;
+    border-radius: 4px;
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .25);
+    pointer-events: auto;
+}
+
+.pk-toolbar-label {
+    padding: 0 6px 0 4px;
+    white-space: nowrap;
+}
+
+.pk-toolbar button,
+.pk-rte button {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-grid;
+    place-items: center;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    cursor: pointer;
+    color: inherit;
+}
+
+.pk-toolbar button:hover,
+.pk-rte button:hover {
+    background: rgba(255, 255, 255, .2);
+}
+
+.pk-toolbar button[data-command="move"] {
+    cursor: grab;
+}
+
+.pk-drop-zone {
+    outline: 2px dashed #16a34a;
+    outline-offset: -2px;
+    background: rgba(22, 163, 74, .06);
+}
+
+.pk-drop-line {
+    position: absolute;
+    height: 3px;
+    margin-top: -1px;
+    border-radius: 2px;
+    background: #16a34a;
+    box-shadow: 0 0 0 1px #fff;
+}
+
+.pk-drop-line.is-vertical {
+    width: 3px;
+    margin-top: 0;
+    margin-left: -1px;
+}
+
+.pk-rte {
+    position: absolute;
+    display: flex;
+    gap: 1px;
+    padding: 2px;
+    border-radius: 4px;
+    background: #111827;
+    color: #fff;
+    font-size: 13px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .3);
+    pointer-events: auto;
+}
+
+[data-pk-empty]::after {
+    content: attr(data-pk-slot-label);
+    display: block;
+    margin: 4px;
+    padding: 22px 12px;
+    border: 1px dashed #94a3b8;
+    border-radius: 4px;
+    background: rgba(148, 163, 184, .08);
+    color: #64748b;
+    font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+    text-align: center;
+}
+
+[data-pk-root] > [data-pk-empty]::after,
+[data-pk-root][data-pk-empty]::after {
+    content: "Drag blocks or templates here to start building";
+    padding: 96px 20px;
+}
+
+.pk-editing {
+    outline: 2px solid #f59e0b !important;
+    outline-offset: 2px;
+    cursor: text;
+}
+
+[data-pk-edit]:not(.pk-editing) {
+    cursor: default;
+}
+
+[data-pk-type="video"] iframe,
+[data-pk-type="video"] video {
+    pointer-events: none;
+}
+
+[data-pk-type="spacer"] {
+    background: repeating-linear-gradient(135deg, rgba(148, 163, 184, .14) 0 6px, transparent 6px 12px);
+}
+
+.pk-missing,
+.pk-empty-block {
+    margin: 4px 0;
+    padding: 12px;
+    border: 1px dashed #f59e0b;
+    border-radius: 4px;
+    background: #fffbeb;
+    color: #92400e;
+    font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.pk-empty-block {
+    border-color: #94a3b8;
+    background: #f8fafc;
+    color: #475569;
+}
+
+body.pk-preview [data-pk-empty]::after {
+    display: none;
+}
+
+body.pk-preview [data-pk-type="spacer"] {
+    background: none;
+}

@@ -1,0 +1,10 @@
+<Dialog Open="open" Title="Exported HTML" OnClose="Close">
+    <ChildContent>
+        <p class="pk-hint">This is the HTML generated from the page. Keep the page JSON as the master copy and regenerate this whenever it changes.</p>
+        <textarea class="pk-input pk-code pk-code-view" readonly spellcheck="false" aria-label="Exported HTML">@html</textarea>
+    </ChildContent>
+    <Footer>
+        <button type="button" class="pk-btn" @onclick="Close">Close</button>
+        <button type="button" class="pk-btn pk-btn-primary" @onclick="() => Editor.CopyAsync(html)">@Icons.Copy<span>Copy</span></button>
+    </Footer>
+</Dialog>

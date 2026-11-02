@@ -1,0 +1,25 @@
+@page "/preview/{Name}"
+
+<PageTitle>Preview · PageKrafter</PageTitle>
+
+<div class="demo-head">
+    <div>
+        <h1>Saved @(email ? "email" : "page")</h1>
+        <p>
+            This is the exported HTML, shown the way a site would show it.
+            @if (!email)
+            {
+                <text>Content zone tokens have been swapped for the zone's blocks, as Inferno's page view does.</text>
+            }
+        </p>
+    </div>
+</div>
+
+@if (html is null)
+{
+    <p class="demo-empty">Nothing has been saved yet. Open the builder and press Save.</p>
+}
+else
+{
+    <iframe class="demo-preview" title="Saved @(email ? "email" : "page")" srcdoc="@html"></iframe>
+}

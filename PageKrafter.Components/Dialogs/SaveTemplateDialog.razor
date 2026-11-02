@@ -1,0 +1,35 @@
+<Dialog Open="open" Title="@(kind == TemplateKind.Page ? "Save page as a template" : "Save block as a template")" OnClose="Close">
+    <ChildContent>
+        <p class="pk-hint">
+            @(kind == TemplateKind.Page
+                ? "Start new pages from this layout on the Templates tab."
+                : "Drag this block, with everything inside it, into any page from the Templates tab.")
+        </p>
+        <div class="pk-field">
+            <label class="pk-label" for="pk-template-name">Name</label>
+            <input id="pk-template-name" class="pk-input" maxlength="100" @bind="name" @bind:event="oninput" />
+        </div>
+        <div class="pk-field">
+            <label class="pk-label" for="pk-template-category">Category</label>
+            <input id="pk-template-category" class="pk-input" placeholder="@TemplateService.SavedCategory" list="pk-template-categories" @bind="category" @bind:event="oninput" />
+            <datalist id="pk-template-categories">
+                @foreach (string existing in Categories)
+                {
+                    <option value="@existing"></option>
+                }
+            </datalist>
+        </div>
+        <div class="pk-field">
+            <label class="pk-label" for="pk-template-description">Description</label>
+            <textarea id="pk-template-description" class="pk-input" rows="2" @bind="description" @bind:event="oninput"></textarea>
+        </div>
+        @if (error is not null)
+        {
+            <p class="pk-error" role="alert">@error</p>
+        }
+    </ChildContent>
+    <Footer>
+        <button type="button" class="pk-btn" @onclick="Close">Cancel</button>
+        <button type="button" class="pk-btn pk-btn-primary" disabled="@saving" @onclick="SaveAsync">Save template</button>
+    </Footer>
+</Dialog>
