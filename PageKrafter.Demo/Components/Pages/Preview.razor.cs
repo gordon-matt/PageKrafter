@@ -40,7 +40,7 @@ public partial class Preview
         html = email ? page : await AddSiteChromeAsync(page);
     }
 
-    // What the CMS page view does with the saved HTML: link the site's stylesheet and fill each zone.
+    // What a host site does with the saved HTML: link its stylesheet and fill each zone.
     private async Task<string> AddSiteChromeAsync(string page)
     {
         page = page.Replace("</head>", $"<base href=\"{Navigation.BaseUri}\"><link rel=\"stylesheet\" href=\"css/site-content.css\"></head>", StringComparison.OrdinalIgnoreCase);

@@ -1,4 +1,4 @@
-# PageKrafter
+<img src="https://github.com/gordon-matt/PageKrafter/blob/master/_Misc/Logo.png" alt="Logo" width="350" />
 
 A drag-and-drop page and email builder for Blazor Server.
 
@@ -170,25 +170,19 @@ Make a component that inherits `FieldEditorBase` and calls `SetValueAsync`. Regi
 
 To replace a block's whole content section in the inspector, set `EditorComponent` to a component that inherits `BlockEditorBase`.
 
-## Using it in Inferno CMS or MantleCMS
+## Regions filled by the host
 
-The demo's `ContentZoneBlock` shows the pattern. Editors place a **Content zone** block anywhere in the page and pick the zone from a list that comes from the CMS. In the editor, the block previews the zone's current content. In exported HTML, it writes the token both CMSs already understand:
+Some parts of a page don't belong to the page itself. A news list, a search box or a sidebar of links come from the host application and change without the page being edited. The demo's `ContentZoneBlock` shows one way to leave room for them.
+
+Editors place a **Content zone** block and pick the zone from a list the host provides (`IZoneCatalog` in the demo). While editing, the block shows a preview of the zone's current content. In exported HTML it writes a token:
 
 ```
 [[ContentZone:Sidebar]]
 ```
 
-Inferno's `StandardPageView` (and Mantle's equivalent) replace that token with the zone's content blocks. So the simplest integration is:
+The host replaces each token with the zone's HTML when the page is shown. The demo's preview page does this in one pass over the whole document, which matters: replacing tokens one piece at a time can leave a column's opening and closing tags in different pieces, and the browser will close them early and break the layout.
 
-1. Keep the PageKrafter JSON in a new column on the page version.
-2. When saving, store `PageRenderer.RenderAsync(document)` in the existing HTML field.
-
-Nothing else in the CMS has to change.
-
-One caveat: Inferno splits the page HTML at each token and renders the pieces as separate `MarkupString`s. That is fine for static server rendering. In an interactive render mode, though, a token inside a column leaves each piece with unclosed tags, and the browser auto-closes them, which breaks the layout. If pages render interactively, use one of these approaches:
-
-- Replace the tokens with the zones' HTML in one pass, then output a single `MarkupString`. The demo's preview page does this.
-- Better, render the JSON at request time with a content zone block whose `RenderAsync` asks the CMS zone service for the zone's HTML directly. The token is then not needed at all.
+The other option skips tokens altogether. Render the JSON at request time and let the zone block's `RenderAsync` ask the host for the zone's HTML directly.
 
 ## Security
 
@@ -201,18 +195,13 @@ The canvas iframe is sandboxed with `allow-scripts allow-same-origin allow-modal
 
 ## Design notes
 
-PageKrafter borrows the best ideas from other builders:
-
-- From **Puck**: the JSON tree as the source of truth, typed fields per block, and slots for nested content.
-- From **GrapesJS**: the iframe canvas and the in-canvas selection toolbar.
-- From **VvvebJs**: `srcdoc` loading and editing in place.
-- From **Silex**: the template workflow and the thumbnails drawn from the block tree.
+The page is a JSON tree of blocks, each with its own fields and slots for nested content. The editor draws the page in an iframe loaded with `srcdoc`, so the host site's CSS applies while editing and the editor's CSS stays out of the page. Selection, the toolbar and inline editing all happen inside that iframe. Template thumbnails are drawn from the block tree rather than stored as images.
 
 Undo works on whole-document snapshots, because pages are small and snapshots are far more robust than replaying operations.
 
 Not built yet:
 
-- Global or shared blocks (symbols).
+- Shared blocks that stay linked, so editing one updates every place it is used.
 - Typed (non-string) props.
 - Multi-select.
 - Collaborative editing.

@@ -17,14 +17,20 @@ body {
     align-items: center;
     gap: 24px;
     padding: 0 20px;
-    height: 48px;
-    background: #111827;
+    height: 56px;
+    background: #000;
 }
 
 .demo-brand {
-    color: #fff;
-    font-weight: 700;
+    display: flex;
+    align-items: center;
     text-decoration: none;
+}
+
+.demo-brand img {
+    display: block;
+    height: 40px;
+    width: auto;
 }
 
 .demo-nav nav {
@@ -102,7 +108,7 @@ body {
 .demo-preview {
     display: block;
     width: 100%;
-    height: calc(100vh - 150px);
+    height: calc(100vh - 158px);
     border: 1px solid #d1d5db;
     border-radius: 8px;
     background: #fff;

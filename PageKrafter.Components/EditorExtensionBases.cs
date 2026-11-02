@@ -27,7 +27,7 @@ public sealed record PropertyChange(string Name, string Value);
 
 /// <summary>
 /// Base for a block's own inspector, set with <see cref="BlockDefinition.EditorComponent"/>. It replaces
-/// the generated content fields, which suits blocks with a richer editor (Inferno-style content blocks).
+/// the generated content fields, which suits blocks that need a richer editor than a list of fields.
 /// </summary>
 public abstract class BlockEditorBase : ComponentBase
 {

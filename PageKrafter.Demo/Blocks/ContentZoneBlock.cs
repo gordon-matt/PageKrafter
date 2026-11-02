@@ -1,9 +1,9 @@
 namespace PageKrafter.Demo.Blocks;
 
 /// <summary>
-/// Places a CMS content zone in the page, the way Inferno and MantleCMS pages do. Exported HTML
-/// holds the <c>[[ContentZone:Name]]</c> token, which those CMSs already swap for the zone's
-/// content blocks when the page is shown, so pages built here work with no CMS changes.
+/// A sample host block: a region whose contents come from the host application rather than the
+/// page. Exported HTML holds a <c>[[ContentZone:Name]]</c> token, which the host replaces with
+/// the zone's HTML when the page is shown.
 /// </summary>
 public sealed class ContentZoneBlock(IZoneCatalog zones) : BlockDefinition
 {

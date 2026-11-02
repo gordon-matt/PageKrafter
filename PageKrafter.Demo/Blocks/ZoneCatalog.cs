@@ -1,6 +1,6 @@
 namespace PageKrafter.Demo.Blocks;
 
-/// <summary>Stands in for the CMS zone service (Inferno's <c>IZoneService</c> plus its content block providers).</summary>
+/// <summary>Stands in for the host application's zone service: the list of zones and the HTML each one produces.</summary>
 public interface IZoneCatalog
 {
     Task<IReadOnlyList<string>> ListAsync(CancellationToken cancellationToken = default);
