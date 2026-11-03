@@ -644,6 +644,17 @@ textarea.pk-input {
     cursor: pointer;
 }
 
+.pk-file {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pk-file .pk-input {
+    flex: 1;
+    min-width: 0;
+}
+
 .pk-color {
     display: flex;
     align-items: center;

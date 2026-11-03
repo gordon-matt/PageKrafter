@@ -36,6 +36,12 @@ public sealed record BlockField
 
     public DocumentMode Modes { get; init; } = DocumentMode.All;
 
+    /// <summary>
+    /// Shows a Browse button on the field that opens the host's <see cref="Files.IFilePicker"/> for this kind of file.
+    /// Image fields browse for images without setting this. It has no effect when the host registered no picker.
+    /// </summary>
+    public FilePickerKind? FilePicker { get; init; }
+
     public static BlockField Text(string name, string label, string defaultValue = "", string group = FieldGroups.Content) =>
         new() { Name = name, Label = label, DefaultValue = defaultValue, Group = group };
 

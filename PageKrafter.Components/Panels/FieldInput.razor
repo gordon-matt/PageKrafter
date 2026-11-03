@@ -56,24 +56,26 @@
                 break;
 
             case FieldEditors.Image:
+            default:
                 <label class="pk-label" for="@InputId">@Field.Label</label>
-                <input id="@InputId" class="pk-input" type="text" value="@Current" placeholder="@Field.Placeholder" @oninput="OnInputAsync" />
-                @if (PreviewUrl.Length > 0)
+                <div class="pk-file">
+                    <input id="@InputId" class="pk-input" type="@(Field.Editor == FieldEditors.Url ? "url" : "text")" value="@Current" placeholder="@Field.Placeholder" @oninput="OnInputAsync" />
+                    @if (CanBrowse)
+                    {
+                        <button type="button" class="pk-mini-btn" title="Browse files" aria-label="Browse files for @Field.Label" @onclick="BrowseAsync">@Icons.Folder</button>
+                    }
+                </div>
+                @if (Field.Editor == FieldEditors.Image && PreviewUrl.Length > 0)
                 {
                     <img class="pk-image-preview" src="@PreviewUrl" alt="" />
                 }
                 break;
-
-            default:
-                <label class="pk-label" for="@InputId">@Field.Label</label>
-                <input id="@InputId" class="pk-input" type="@(Field.Editor == FieldEditors.Url ? "url" : "text")" value="@Current" placeholder="@Field.Placeholder" @oninput="OnInputAsync" />
-                break;
         }
     }
 
-    @if (optionsError is not null)
+    @if (Error is not null)
     {
-        <small class="pk-error">@optionsError</small>
+        <small class="pk-error">@Error</small>
     }
     else if (Field.HelpText is { Length: > 0 } help)
     {

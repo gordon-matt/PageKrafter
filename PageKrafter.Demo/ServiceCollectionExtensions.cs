@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
             services.AddPageKrafterBlock<ContentZoneBlock>();
             services.AddPageKrafterBlock<CalloutBlock>();
             services.AddPageKrafterFieldEditor<CalloutTonePicker>(CalloutBlock.ToneEditor);
+            services.AddPageKrafterJsFilePicker("DemoFiles.pick");
             services.AddPageKrafterJsonFileTemplates(Path.Combine(data, "templates"));
 
             services.AddSingleton<IZoneCatalog, DemoZoneCatalog>();

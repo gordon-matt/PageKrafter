@@ -22,5 +22,27 @@ public static class ServiceCollectionExtensions
         public IServiceCollection AddPageKrafterFieldEditor<TComponent>(string editor)
             where TComponent : FieldEditorBase =>
             services.Configure<PageKrafterOptions>(options => options.FieldEditorComponents[editor] = typeof(TComponent));
+
+        /// <summary>
+        /// Plugs in a file manager. Image fields, and fields with <see cref="BlockField.FilePicker"/> set, get a Browse
+        /// button that calls it. The picker is scoped to the user's circuit, so it can use other scoped services.
+        /// </summary>
+        public IServiceCollection AddPageKrafterFilePicker<TPicker>()
+            where TPicker : class, IFilePicker
+        {
+            services.Replace(ServiceDescriptor.Scoped<IFilePicker, TPicker>());
+            return services;
+        }
+
+        /// <summary>
+        /// Plugs in a browser-based file manager through a global JavaScript function, such as <c>"MyApp.pickFile"</c>.
+        /// See <see cref="JsFilePicker"/> for the contract.
+        /// </summary>
+        public IServiceCollection AddPageKrafterJsFilePicker(string function)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(function);
+            services.Replace(ServiceDescriptor.Scoped<IFilePicker>(provider => new JsFilePicker(provider.GetRequiredService<IJSRuntime>(), function)));
+            return services;
+        }
     }
 }

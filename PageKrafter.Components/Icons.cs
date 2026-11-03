@@ -17,6 +17,7 @@ internal static class Icons
     public static readonly MarkupString Copy = new(Open + """<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>""" + Close);
     public static readonly MarkupString Parent = new(Open + """<path d="M12 19V5M6 11l6-6 6 6"/>""" + Close);
     public static readonly MarkupString Star = new(Open + """<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>""" + Close);
+    public static readonly MarkupString Folder = new(Open + """<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>""" + Close);
     public static readonly MarkupString X = new(Open + """<path d="M6 6l12 12M18 6 6 18"/>""" + Close);
     public static readonly MarkupString Chevron = new(Open + """<path d="m9 6 6 6-6 6"/>""" + Close);
     public static readonly MarkupString Up = new(Open + """<path d="m6 15 6-6 6 6"/>""" + Close);

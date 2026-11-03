@@ -16,7 +16,7 @@ public sealed partial class VideoBlock : BlockDefinition
 
     public override IReadOnlyList<BlockField> Fields { get; } =
     [
-        BlockField.Url("url", "Video link") with { HelpText = "A YouTube or Vimeo link, or a direct link to an .mp4 or .webm file." },
+        BlockField.Url("url", "Video link") with { FilePicker = FilePickerKind.Video, HelpText = "A YouTube or Vimeo link, or a direct link to an .mp4 or .webm file." },
         BlockField.Select("aspect", "Aspect ratio", "16:9", ("16:9", "16:9"), ("4:3", "4:3"), ("1:1", "Square"), ("21:9", "21:9")),
     ];
 

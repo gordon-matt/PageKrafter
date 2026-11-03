@@ -166,9 +166,51 @@ Derive from `ComponentBlockDefinition<TComponent>` and write the markup in a com
 
 ### Custom inspector fields
 
-Make a component that inherits `FieldEditorBase` and calls `SetValueAsync`. Register it with `services.AddPageKrafterFieldEditor<TonePicker>("acme.tone")`, then use `Editor = "acme.tone"` on a field. Registering a built-in name such as `"image"` replaces that editor everywhere. For example, you could use it to plug in your media library.
+Make a component that inherits `FieldEditorBase` and calls `SetValueAsync`. Register it with `services.AddPageKrafterFieldEditor<TonePicker>("acme.tone")`, then use `Editor = "acme.tone"` on a field. Registering a built-in name such as `"image"` replaces that editor everywhere.
 
 To replace a block's whole content section in the inspector, set `EditorComponent` to a component that inherits `BlockEditorBase`.
+
+### File picker
+
+PageKrafter has no file manager of its own. Plug in the one your site already uses and image fields get a **Browse** button. Without one, they stay plain text boxes.
+
+The contract is one method. Implement `IFilePicker`, open your file manager, and return the file the editor chose, or `null` if they closed it:
+
+```csharp
+public sealed class MediaLibraryPicker(IMediaDialog dialog) : IFilePicker
+{
+    public async ValueTask<PickedFile?> PickAsync(FilePickRequest request, CancellationToken cancellationToken = default)
+    {
+        var file = await dialog.ChooseAsync(request.Kind == FilePickerKind.Image, request.Current);
+        return file is null ? null : new PickedFile(file.Url, file.Name);
+    }
+}
+
+services.AddPageKrafterFilePicker<MediaLibraryPicker>();
+```
+
+The request has the `Kind` (`Any`, `Image` or `Video`), a `Title`, and the field's `Current` value. The picker is scoped to the user's circuit, so it can inject other scoped services.
+
+If your file manager runs in the browser, skip the C# and register a global JavaScript function instead:
+
+```csharp
+services.AddPageKrafterJsFilePicker("MyApp.pickFile");
+```
+
+```js
+window.MyApp = {
+    pickFile: async ({ kind, title, current }) => {
+        const file = await myFileManager.open({ type: kind });   // kind is "any", "image" or "video"
+        return file ? { url: file.url, name: file.name } : null; // null when closed without choosing
+    },
+};
+```
+
+Derive from `JsFilePicker` and override `CreateArgument` if the function needs more than the request, such as a folder that depends on the signed-in user.
+
+Section backgrounds and images use `Image`, and the video block uses `Video`. Add a Browse button to any other field with `BlockField.Url("file", "Download") with { FilePicker = FilePickerKind.Any }`.
+
+Pages can store root-relative paths such as `/media/photo.jpg`. For email documents, make the picker return absolute URLs, because mail clients can't resolve relative ones. The demo's `demo-files.js` is a small working example.
 
 ## Regions filled by the host
 

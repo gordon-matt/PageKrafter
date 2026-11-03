@@ -7,6 +7,8 @@ public partial class FieldInput
     private IReadOnlyList<FieldOption> loadedOptions = [];
     private string? optionsKey;
     private string? optionsError;
+    private string? pickError;
+    private IFilePicker? picker;
 
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
@@ -23,7 +25,16 @@ public partial class FieldInput
     [Inject]
     private ILogger<FieldInput> Logger { get; set; } = default!;
 
+    [Inject]
+    private IServiceProvider Services { get; set; } = default!;
+
     private string InputId => $"pk-{Node.Id}-{Field.Name}";
+
+    private string? Error => optionsError ?? pickError;
+
+    private FilePickerKind? PickKind => Field.FilePicker ?? (Field.Editor == FieldEditors.Image ? FilePickerKind.Image : null);
+
+    private bool CanBrowse => picker is not null && PickKind is not null;
 
     private string Current => Node.Get(Field.Name) ?? Field.DefaultValue;
 
@@ -51,6 +62,8 @@ public partial class FieldInput
     private string ColorSwatch => Current.Length == 7 && Current[0] == '#' ? Current : "#000000";
 
     private string PreviewUrl => Html.SafeUrl(Current, allowDataImage: true);
+
+    protected override void OnInitialized() => picker = Services.GetService<IFilePicker>();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -80,6 +93,33 @@ public partial class FieldInput
     }
 
     private Task SetAsync(string value) => Editor.SetPropAsync(Node.Id, Field.Name, value);
+
+    private async Task BrowseAsync()
+    {
+        if (picker is null || PickKind is not { } kind)
+        {
+            return;
+        }
+
+        // Not guarded against a second click. Some file managers give no signal when they are closed
+        // without a choice, so a click has to be able to start over.
+        pickError = null;
+        string nodeId = Node.Id;
+        string fieldName = Field.Name;
+        try
+        {
+            var picked = await picker.PickAsync(new FilePickRequest(kind, Field.Label, Current.Length > 0 ? Current : null));
+            if (picked is not null)
+            {
+                await Editor.SetPropAsync(nodeId, fieldName, picked.Url);
+            }
+        }
+        catch (Exception ex) when (ex is not (OperationCanceledException or JSDisconnectedException))
+        {
+            Logger.LogWarning(ex, "The file picker failed for {BlockType}.{FieldName}.", Definition.Type, fieldName);
+            pickError = "The file picker couldn't be opened.";
+        }
+    }
 
     private Task OnInputAsync(ChangeEventArgs args) => SetAsync(args.Value?.ToString() ?? string.Empty);
 
