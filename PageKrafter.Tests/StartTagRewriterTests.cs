@@ -46,8 +46,5 @@ public class StartTagRewriterTests
     [InlineData("")]
     [InlineData("plain text")]
     [InlineData("[[ContentZone:Main]]")]
-    public void Returns_null_when_there_is_no_leading_element(string input)
-    {
-        Assert.Null(StartTagRewriter.Apply(input, "c", string.Empty, []));
-    }
+    public void Returns_null_when_there_is_no_leading_element(string input) => Assert.Null(StartTagRewriter.Apply(input, "c", string.Empty, []));
 }

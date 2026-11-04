@@ -51,12 +51,9 @@ public sealed class EditorSession
     public Result<string> Insert(string blockType, string parentId, string slot, int index)
     {
         var definition = registry.Find(blockType);
-        if (definition is null || !IsAllowed(definition))
-        {
-            return Invalid<string>("That block isn't available here.");
-        }
-
-        return InsertNode(definition.Create(), parentId, slot, index);
+        return definition is null || !IsAllowed(definition)
+            ? Invalid<string>("That block isn't available here.")
+            : InsertNode(definition.Create(), parentId, slot, index);
     }
 
     public Result<string> InsertTemplate(PageTemplate template, string parentId, string slot, int index)
@@ -69,12 +66,9 @@ public sealed class EditorSession
     public Result<string> InsertNearSelection(string blockType)
     {
         var definition = registry.Find(blockType);
-        if (definition is null || !IsAllowed(definition))
-        {
-            return Invalid<string>("That block isn't available here.");
-        }
-
-        return InsertNear(definition.Create());
+        return definition is null || !IsAllowed(definition)
+            ? Invalid<string>("That block isn't available here.")
+            : InsertNear(definition.Create());
     }
 
     public Result<string> InsertTemplateNearSelection(PageTemplate template)
@@ -274,25 +268,16 @@ public sealed class EditorSession
         }
 
         var childDefinition = registry.Find(node.Type);
-        if (childDefinition is null)
-        {
-            return parentDefinition.GetSlots(parent).Any(candidate => candidate.Name == slot) ? null : "Blocks can't go there.";
-        }
-
-        return parentDefinition.CanContain(parent, slot, childDefinition) && childDefinition.CanBePlacedIn(parent, slot)
+        return childDefinition is null
+            ? parentDefinition.GetSlots(parent).Any(candidate => candidate.Name == slot) ? null : "Blocks can't go there."
+            : parentDefinition.CanContain(parent, slot, childDefinition) && childDefinition.CanBePlacedIn(parent, slot)
             ? null
             : $"{childDefinition.Label} can't go inside {parentDefinition.Label}.";
     }
 
-    private string? TemplateError(PageTemplate template)
-    {
-        if (template.Kind != TemplateKind.Section)
-        {
-            return "Page templates replace the whole page. Use Apply instead.";
-        }
-
-        return template.Mode == Document.Mode ? null : $"That template is for {Describe(template.Mode)}.";
-    }
+    private string? TemplateError(PageTemplate template) => template.Kind != TemplateKind.Section
+            ? "Page templates replace the whole page. Use Apply instead."
+            : template.Mode == Document.Mode ? null : $"That template is for {Describe(template.Mode)}.";
 
     private void Commit(Action change, string? coalesceKey = null)
     {

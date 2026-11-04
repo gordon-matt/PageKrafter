@@ -34,10 +34,7 @@ public class ColumnsBlockTests
     [InlineData("1:2", 3, new[] { 1.0, 1.0, 1.0 })]
     [InlineData("0:1", 2, new[] { 1.0, 1.0 })]
     [InlineData(null, 2, new[] { 1.0, 1.0 })]
-    public void Ratios_fall_back_to_equal_widths(string? widths, int count, double[] expected)
-    {
-        Assert.Equal(expected.Select(value => (decimal)value), ColumnsBlock.ParseRatios(widths, count));
-    }
+    public void Ratios_fall_back_to_equal_widths(string? widths, int count, double[] expected) => Assert.Equal(expected.Select(value => (decimal)value), ColumnsBlock.ParseRatios(widths, count));
 
     [Fact]
     public async Task Width_presets_follow_the_column_count()

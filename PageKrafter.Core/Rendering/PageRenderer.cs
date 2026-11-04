@@ -99,12 +99,9 @@ public sealed class PageRenderer(BlockRegistry registry, IHtmlContentSanitizer s
         }
 
         string? rewritten = StartTagRewriter.Apply(html, cssClass, style, attributes);
-        if (rewritten is not null)
-        {
-            return rewritten;
-        }
-
-        return editor ? StartTagRewriter.Apply($"<div class=\"pk-wrap\">{html}</div>", cssClass, style, attributes)! : html;
+        return rewritten is not null
+            ? rewritten
+            : editor ? StartTagRewriter.Apply($"<div class=\"pk-wrap\">{html}</div>", cssClass, style, attributes)! : html;
     }
 
     private static IEnumerable<(string Name, string Value)> EditorAttributes(BlockNode node, string label) =>

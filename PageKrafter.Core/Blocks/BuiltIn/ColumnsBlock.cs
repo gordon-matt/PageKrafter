@@ -49,8 +49,8 @@ public sealed class ColumnsBlock : BlockDefinition
     /// <summary>Reads a ratio like <c>1:2</c>. Anything that doesn't match the column count gives equal widths.</summary>
     public static decimal[] ParseRatios(string? widths, int count)
     {
-        var parts = (widths ?? string.Empty).Split([':', ',', ' '], StringSplitOptions.RemoveEmptyEntries);
-        var ratios = parts
+        string[] parts = (widths ?? string.Empty).Split([':', ',', ' '], StringSplitOptions.RemoveEmptyEntries);
+        decimal[] ratios = parts
             .Select(part => decimal.TryParse(part, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value) && value > 0 ? value : 0)
             .ToArray();
 

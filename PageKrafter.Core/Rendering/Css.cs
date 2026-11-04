@@ -16,14 +16,11 @@ public static partial class Css
         }
 
         string trimmed = value.Trim();
-        if (trimmed.Contains("expression(", StringComparison.OrdinalIgnoreCase)
+        return trimmed.Contains("expression(", StringComparison.OrdinalIgnoreCase)
             || trimmed.Contains("javascript:", StringComparison.OrdinalIgnoreCase)
-            || trimmed.Contains("@import", StringComparison.OrdinalIgnoreCase))
-        {
-            return string.Empty;
-        }
-
-        return new string(trimmed.Where(c => c is not (';' or '{' or '}' or '<' or '>' or '"' or '\\') && !char.IsControl(c)).ToArray()).Trim();
+            || trimmed.Contains("@import", StringComparison.OrdinalIgnoreCase)
+            ? string.Empty
+            : new string(trimmed.Where(c => c is not (';' or '{' or '}' or '<' or '>' or '"' or '\\') && !char.IsControl(c)).ToArray()).Trim();
     }
 
     public static string UrlValue(string? url)

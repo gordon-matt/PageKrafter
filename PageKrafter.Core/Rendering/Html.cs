@@ -43,7 +43,7 @@ public static class Html
         }
 
         string url = value.Trim();
-        string compact = new string(url.Where(c => !char.IsWhiteSpace(c) && !char.IsControl(c)).ToArray());
+        string compact = new(url.Where(c => !char.IsWhiteSpace(c) && !char.IsControl(c)).ToArray());
         int colon = compact.IndexOf(':');
         int boundary = compact.IndexOfAny(['/', '?', '#']);
         if (colon <= 0 || (boundary >= 0 && boundary < colon))
@@ -52,12 +52,9 @@ public static class Html
         }
 
         string scheme = compact[..colon].ToLowerInvariant();
-        if (AllowedSchemes.Contains(scheme, StringComparer.Ordinal))
-        {
-            return url;
-        }
-
-        return allowDataImage && compact.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase) && !compact.StartsWith("data:image/svg", StringComparison.OrdinalIgnoreCase)
+        return AllowedSchemes.Contains(scheme, StringComparer.Ordinal)
+            ? url
+            : allowDataImage && compact.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase) && !compact.StartsWith("data:image/svg", StringComparison.OrdinalIgnoreCase)
             ? url
             : string.Empty;
     }

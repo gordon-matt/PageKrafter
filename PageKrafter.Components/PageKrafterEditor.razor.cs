@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using Heroicsoft.NetForge.Components.Toasts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PageKrafter.Components.Dialogs;
@@ -29,8 +30,6 @@ public partial class PageKrafterEditor
     private LeftTab leftTab = LeftTab.Blocks;
     private bool preview;
     private bool saving;
-    private string? toast;
-    private CancellationTokenSource? toastTimer;
     private SaveTemplateDialog saveDialog = default!;
     private CodeDialog codeDialog = default!;
 
@@ -94,6 +93,9 @@ public partial class PageKrafterEditor
     [Inject]
     private ILogger<PageKrafterEditor> Logger { get; set; } = default!;
 
+    [Inject]
+    private ToastService Toasts { get; set; } = default!;
+
     public PageDocument Document => Session.Document;
 
     internal EditorSession Session { get; private set; } = default!;
@@ -116,12 +118,15 @@ public partial class PageKrafterEditor
                 Session.Select(message.Id);
                 StateHasChanged();
                 break;
+
             case "drop":
                 await DropAsync(message);
                 break;
+
             case "command":
                 await RunCommandAsync(message.Command, message.Id);
                 break;
+
             case "inline":
                 await InlineEditAsync(message);
                 break;
@@ -130,8 +135,6 @@ public partial class PageKrafterEditor
 
     public async ValueTask DisposeAsync()
     {
-        toastTimer?.Cancel();
-        toastTimer?.Dispose();
         if (module is not null)
         {
             try
@@ -171,9 +174,11 @@ public partial class PageKrafterEditor
             case "undo":
                 await UndoAsync();
                 return;
+
             case "redo":
                 await RedoAsync();
                 return;
+
             case "deselect":
                 await SelectAsync(null);
                 return;
@@ -190,18 +195,23 @@ public partial class PageKrafterEditor
             case "delete":
                 await ApplyAsync(Session.Delete(id));
                 break;
+
             case "duplicate":
                 await ApplyAsync(Session.Duplicate(id));
                 break;
+
             case "up":
                 await ApplyAsync(Session.MoveBy(id, -1));
                 break;
+
             case "down":
                 await ApplyAsync(Session.MoveBy(id, 1));
                 break;
+
             case "parent":
                 await SelectAsync(Session.ParentId(id));
                 break;
+
             case "save-template":
                 OpenSaveTemplate(TemplateKind.Section, id);
                 break;
@@ -234,7 +244,7 @@ public partial class PageKrafterEditor
         if (saved.IsSuccess)
         {
             await LoadTemplatesAsync();
-            ShowToast($"Saved \"{saved.Value.Name}\". Find it on the Templates tab.");
+            Toasts.Success($"Saved \"{saved.Value.Name}\". Find it on the Templates tab.");
         }
 
         return saved;
@@ -250,7 +260,7 @@ public partial class PageKrafterEditor
         var deleted = await TemplateService.DeleteAsync(template.Id);
         if (!deleted.IsSuccess)
         {
-            ShowToast(deleted.ErrorMessage());
+            Toasts.Error(deleted.ErrorMessage());
         }
 
         await LoadTemplatesAsync();
@@ -262,7 +272,7 @@ public partial class PageKrafterEditor
         if (module is not null)
         {
             await module.InvokeVoidAsync("copyText", text);
-            ShowToast("Copied to the clipboard.");
+            Toasts.Success("Copied to the clipboard.");
         }
     }
 
@@ -322,7 +332,7 @@ public partial class PageKrafterEditor
         }
 
         Logger.LogWarning("Could not read the page data, so a new document was started: {Reason}", parsed.ErrorMessage());
-        ShowToast("The saved page couldn't be read, so a new one was started.");
+        Toasts.Warning("The saved page couldn't be read, so a new one was started.");
         return PageDocument.Create(Mode);
     }
 
@@ -335,7 +345,7 @@ public partial class PageKrafterEditor
         }
         else
         {
-            ShowToast(listed.ErrorMessage());
+            Toasts.Error(listed.ErrorMessage());
         }
     }
 
@@ -377,7 +387,7 @@ public partial class PageKrafterEditor
     {
         if (!result.Succeeded())
         {
-            ShowToast(result.ErrorMessage());
+            Toasts.Error(result.ErrorMessage());
             StateHasChanged();
             return;
         }
@@ -475,24 +485,6 @@ public partial class PageKrafterEditor
 
     private async Task<bool> ConfirmAsync(string message) =>
         module is null || await module.InvokeAsync<bool>("confirmAction", message);
-
-    private void ShowToast(string message)
-    {
-        toast = message;
-        toastTimer?.Cancel();
-        toastTimer?.Dispose();
-        toastTimer = new CancellationTokenSource();
-        var token = toastTimer.Token;
-        _ = Task.Delay(TimeSpan.FromSeconds(4), token).ContinueWith(
-            _ => InvokeAsync(() =>
-            {
-                toast = null;
-                StateHasChanged();
-            }),
-            token,
-            TaskContinuationOptions.OnlyOnRanToCompletion,
-            TaskScheduler.Default);
-    }
 
     private enum LeftTab
     {

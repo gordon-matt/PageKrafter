@@ -1,13 +1,16 @@
 .pk-editor {
-    --pk-bg: #f1f5f9;
-    --pk-panel: #ffffff;
-    --pk-border: #e2e8f0;
-    --pk-text: #0f172a;
-    --pk-muted: #64748b;
-    --pk-accent: #2563eb;
-    --pk-accent-soft: #eff6ff;
-    --pk-danger: #dc2626;
+    /* Same tokens as the host shell, so the chrome follows the theme toggle. Fallbacks cover a host without them. */
+    --pk-bg: var(--nf-bg, #f1f5f9);
+    --pk-panel: var(--nf-surface, #ffffff);
+    --pk-border: var(--nf-border, #e2e8f0);
+    --pk-text: var(--nf-text, #0f172a);
+    --pk-muted: var(--nf-muted, #64748b);
+    --pk-accent: var(--nf-accent, #2563eb);
+    --pk-accent-soft: var(--nf-accent-soft, #eff6ff);
+    --pk-danger: var(--nf-danger, #dc2626);
     --pk-radius: 6px;
+    --pk-input: var(--nf-surface-2, #ffffff);
+    color-scheme: inherit;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -265,7 +268,7 @@ details.pk-group[open] > summary::before {
     padding: 6px 8px;
     border: 1px solid var(--pk-border);
     border-radius: var(--pk-radius);
-    background: #fff;
+    background: var(--pk-input);
     color: var(--pk-text);
     font: inherit;
 }
@@ -304,7 +307,7 @@ textarea.pk-input {
     padding: 8px 4px;
     border: 1px solid var(--pk-border);
     border-radius: var(--pk-radius);
-    background: #fff;
+    background: var(--pk-panel);
     color: var(--pk-text);
     font-size: 12px;
     text-align: center;
@@ -340,7 +343,7 @@ textarea.pk-input {
     padding: 6px;
     border: 1px solid var(--pk-border);
     border-radius: var(--pk-radius);
-    background: #fff;
+    background: var(--pk-panel);
     cursor: pointer;
     user-select: none;
 }
@@ -364,7 +367,7 @@ textarea.pk-input {
     padding: 0;
     border: 1px solid var(--pk-border);
     border-radius: 50%;
-    background: #fff;
+    background: var(--pk-panel);
     color: var(--pk-danger);
     cursor: pointer;
 }
@@ -569,6 +572,7 @@ textarea.pk-input {
     min-width: 0;
     padding: 16px;
     overflow: auto;
+    background: var(--pk-bg);
 }
 
 .pk-frame-wrap {
@@ -668,7 +672,7 @@ textarea.pk-input {
     padding: 2px;
     border: 1px solid var(--pk-border);
     border-radius: var(--pk-radius);
-    background: #fff;
+    background: var(--pk-input);
     cursor: pointer;
 }
 
@@ -702,20 +706,6 @@ textarea.pk-input {
     align-items: flex-start;
     gap: 10px;
     color: var(--pk-muted);
-}
-
-.pk-toast {
-    position: absolute;
-    left: 50%;
-    bottom: 16px;
-    z-index: 20;
-    max-width: 80%;
-    padding: 10px 16px;
-    border-radius: var(--pk-radius);
-    background: #0f172a;
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(15, 23, 42, .3);
-    transform: translateX(-50%);
 }
 
 .pk-dialog-backdrop {
@@ -770,6 +760,19 @@ textarea.pk-input {
 .pk-code-view {
     min-height: 320px;
     white-space: pre;
+}
+
+/* Hosts that set data-theme but do not provide the shell tokens. The canvas (.pk-frame) stays light. */
+[data-theme="dark"] .pk-editor {
+    --pk-bg: var(--nf-bg, #0f1419);
+    --pk-panel: var(--nf-surface, #1c2128);
+    --pk-input: var(--nf-surface-2, #0d1117);
+    --pk-border: var(--nf-border, #30363d);
+    --pk-text: var(--nf-text, #e6edf3);
+    --pk-muted: var(--nf-muted, #8d96a0);
+    --pk-accent: var(--nf-accent, #4493f8);
+    --pk-accent-soft: var(--nf-accent-soft, rgba(68, 147, 248, 0.18));
+    --pk-danger: var(--nf-danger, #f85149);
 }
 
 @media (max-width: 900px) {

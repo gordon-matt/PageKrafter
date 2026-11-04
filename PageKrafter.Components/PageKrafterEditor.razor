@@ -1,6 +1,8 @@
 @implements IAsyncDisposable
 
-<link rel="stylesheet" href="@CanvasDocument.StylesheetUrl" />
+<HeadContent>
+    <link rel="stylesheet" href="@CanvasDocument.StylesheetUrl" />
+</HeadContent>
 <div class="pk-editor@(preview ? " is-preview" : null)" style="height:@Height" tabindex="-1" @ref="host">
     <header class="pk-topbar">
         <div class="pk-topbar-group">
@@ -61,11 +63,6 @@
             <Inspector Editor="this" />
         </aside>
     </div>
-
-    @if (toast is not null)
-    {
-        <div class="pk-toast" role="status">@toast</div>
-    }
 
     <SaveTemplateDialog @ref="saveDialog" Editor="this" />
     <CodeDialog @ref="codeDialog" Editor="this" />

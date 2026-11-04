@@ -1,3 +1,4 @@
+using Heroicsoft.NetForge.Components.Toasts;
 using PageKrafter.Demo.Storage;
 
 namespace PageKrafter.Demo.Components.Pages;
@@ -10,6 +11,9 @@ public partial class BuilderPage
 
     [Inject]
     private DemoPageStore Pages { get; set; } = default!;
+
+    [Inject]
+    private ToastService Toasts { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public string Name { get; set; } = default!;
@@ -33,5 +37,6 @@ public partial class BuilderPage
     {
         await Pages.SaveAsync(Name, document);
         status = $"Saved at {DateTime.Now:HH:mm:ss}";
+        Toasts.Success("Saved.");
     }
 }

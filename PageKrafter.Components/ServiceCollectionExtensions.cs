@@ -1,3 +1,4 @@
+using Heroicsoft.NetForge.Components.Toasts;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace PageKrafter.Components;
@@ -9,12 +10,13 @@ public static class ServiceCollectionExtensions
         /// <summary>
         /// Registers the editor and everything from <c>AddPageKrafterCore</c>. Add host blocks with
         /// <c>AddPageKrafterBlock&lt;T&gt;()</c> and a template store with <c>AddPageKrafterJsonFileTemplates</c>
-        /// or <c>AddPageKrafterTemplateStore&lt;T&gt;()</c>.
+        /// or <c>AddPageKrafterTemplateStore&lt;T&gt;()</c>. The editor reports through the NetForge toast service, so the host layout needs a <c>Toaster</c>.
         /// </summary>
         public IServiceCollection AddPageKrafter(Action<PageKrafterOptions>? configure = null)
         {
             services.AddPageKrafterCore(configure);
             services.TryAddScoped<BlockComponentRenderer>();
+            services.TryAddScoped<ToastService>();
             return services;
         }
 

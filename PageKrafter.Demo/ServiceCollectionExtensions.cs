@@ -1,4 +1,3 @@
-using PageKrafter.Demo.Blocks;
 using PageKrafter.Demo.Storage;
 
 namespace PageKrafter.Demo;
@@ -11,10 +10,7 @@ public static class ServiceCollectionExtensions
         {
             string data = Path.Combine(contentRoot, "App_Data");
 
-            services.AddPageKrafter(options =>
-            {
-                options.CanvasStyles.Add("css/site-content.css");
-            });
+            services.AddPageKrafter(options => options.CanvasStyles.Add("css/site-content.css"));
 
             services.AddPageKrafterBlock<ContentZoneBlock>();
             services.AddPageKrafterBlock<CalloutBlock>();

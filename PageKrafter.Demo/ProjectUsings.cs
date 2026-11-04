@@ -1,5 +1,4 @@
 global using Microsoft.AspNetCore.Components;
-global using PageKrafter;
 global using PageKrafter.Blocks;
 global using PageKrafter.Components;
 global using PageKrafter.Demo.Blocks;

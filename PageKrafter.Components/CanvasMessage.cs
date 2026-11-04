@@ -30,7 +30,8 @@ internal static class CanvasDocument
 {
     private const string AssetRoot = "_content/PageKrafter.Components/";
 
-    private static readonly string Version = typeof(CanvasDocument).Assembly.GetName().Version?.ToString() ?? "1";
+    // Bumped when the editor assets change, so a browser does not keep an older stylesheet at the same address.
+    private static readonly string AssetVersion = typeof(CanvasDocument).Assembly.GetName().Version?.ToString() ?? "1";
 
     public static string Build(string bodyHtml, DocumentMode mode, string baseUri, IEnumerable<string> styles, string? headHtml)
     {
@@ -55,17 +56,17 @@ internal static class CanvasDocument
             <base href="{Html.Encode(baseUri)}">
             {links}
             <style>{BaseStyles.For(mode)}</style>
-            <link rel="stylesheet" href="{AssetRoot}pagekrafter-canvas.css?v={Version}">
+            <link rel="stylesheet" href="{AssetRoot}pagekrafter-canvas.css?v={AssetVersion}">
             </head>
             <body class="pk-canvas {modeClass}">
             <div id="pk-canvas-root">{bodyHtml}</div>
-            <script src="{AssetRoot}pagekrafter-canvas.js?v={Version}"></script>
+            <script src="{AssetRoot}pagekrafter-canvas.js?v={AssetVersion}"></script>
             </body>
             </html>
             """;
     }
 
-    public static string ModuleUrl => $"./{AssetRoot}pagekrafter.js?v={Version}";
+    public static string ModuleUrl => $"./{AssetRoot}pagekrafter.js?v={AssetVersion}";
 
-    public static string StylesheetUrl => $"{AssetRoot}pagekrafter.css?v={Version}";
+    public static string StylesheetUrl => $"{AssetRoot}pagekrafter.css?v={AssetVersion}";
 }

@@ -31,7 +31,10 @@ public static class CommonStyles
 
     internal static ResolvedStyles Resolve(BlockNode node, DocumentMode mode, IReadOnlyCollection<string> skip)
     {
-        string Read(string name) => skip.Contains(name) ? string.Empty : node.Get(name) ?? string.Empty;
+        string Read(string name)
+        {
+            return skip.Contains(name) ? string.Empty : node.Get(name) ?? string.Empty;
+        }
 
         string style = Css.Declarations(
             ("padding", Read(Padding)),

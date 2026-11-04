@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using PageKrafter.Components;
 
@@ -36,7 +35,7 @@ public class ExtensibilityTests
     {
         var registry = TestHost.Registry();
 
-        var email = registry.PaletteFor(DocumentMode.Email).Select(definition => definition.Type).ToArray();
+        string[] email = registry.PaletteFor(DocumentMode.Email).Select(definition => definition.Type).ToArray();
 
         Assert.Contains(BlockTypes.Columns, email);
         Assert.DoesNotContain(BlockTypes.Video, email);

@@ -4,7 +4,6 @@ namespace PageKrafter.Components.Panels;
 
 public partial class FieldInput
 {
-    private IReadOnlyList<FieldOption> loadedOptions = [];
     private string? optionsKey;
     private string? optionsError;
     private string? pickError;
@@ -52,12 +51,14 @@ public partial class FieldInput
     {
         get
         {
-            var options = Field.HasDynamicOptions ? loadedOptions : Field.Options;
+            var options = Field.HasDynamicOptions ? field : Field.Options;
             return Current.Length > 0 && options.All(option => option.Value != Current)
                 ? [.. options, new FieldOption(Current, $"{Current} (not in the list)")]
                 : options;
         }
-    }
+
+        set;
+    } = [];
 
     private string ColorSwatch => Current.Length == 7 && Current[0] == '#' ? Current : "#000000";
 
@@ -72,7 +73,7 @@ public partial class FieldInput
             return;
         }
 
-        string key = string.Join('|', Field.OptionsDependOn.Select(name => Node.Get(name)).Prepend(Node.Id));
+        string key = string.Join('|', Field.OptionsDependOn.Select(Node.Get).Prepend(Node.Id));
         if (key == optionsKey)
         {
             return;
@@ -81,13 +82,13 @@ public partial class FieldInput
         optionsKey = key;
         try
         {
-            loadedOptions = await Definition.GetOptionsAsync(Field, Node);
+            Options = await Definition.GetOptionsAsync(Field, Node);
             optionsError = null;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             Logger.LogWarning(ex, "Options for {BlockType}.{FieldName} could not be loaded.", Definition.Type, Field.Name);
-            loadedOptions = [];
+            Options = [];
             optionsError = "The options couldn't be loaded.";
         }
     }
