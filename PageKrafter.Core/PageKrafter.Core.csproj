@@ -4,6 +4,7 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<RootNamespace>PageKrafter</RootNamespace>
 		<Description>Document model, block registry, templates and HTML rendering for the PageKrafter page and email builder.</Description>
+		<PackageTags>page-builder;email-builder;drag-and-drop;html-rendering;document-model;templates;cms</PackageTags>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -4,6 +4,7 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<RootNamespace>PageKrafter.Components</RootNamespace>
 		<Description>Drag-and-drop page and email builder for Blazor Server, built on PageKrafter.Core.</Description>
+		<PackageTags>blazor;blazor-server;razor-class-library;page-builder;email-builder;drag-and-drop;wysiwyg;cms;aspnetcore;netforge</PackageTags>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -11,7 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Heroicsoft.NetForge.Components" Version="1.2.2" />
+		<PackageReference Include="Heroicsoft.NetForge.Components" Version="1.2.3" />
 		<ProjectReference Include="..\PageKrafter.Core\PageKrafter.Core.csproj" />
 	</ItemGroup>
 
