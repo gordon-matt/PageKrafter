@@ -37,6 +37,9 @@ public partial class PageKrafterEditor
     [Parameter]
     public string? Value { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value changed.
+    /// </summary>
     [Parameter]
     public EventCallback<string?> ValueChanged { get; set; }
 
@@ -48,6 +51,9 @@ public partial class PageKrafterEditor
     [Parameter]
     public EventCallback<PageDocument> OnSave { get; set; }
 
+    /// <summary>
+    /// Gets or sets the height.
+    /// </summary>
     [Parameter]
     public string Height { get; set; } = "80vh";
 
@@ -59,6 +65,9 @@ public partial class PageKrafterEditor
     [Parameter]
     public IReadOnlyCollection<string>? AllowedBlocks { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this instance is show templates.
+    /// </summary>
     [Parameter]
     public bool ShowTemplates { get; set; } = true;
 
@@ -96,6 +105,9 @@ public partial class PageKrafterEditor
     [Inject]
     private ToastService Toasts { get; set; } = default!;
 
+    /// <summary>
+    /// Gets the document.
+    /// </summary>
     public PageDocument Document => Session.Document;
 
     internal EditorSession Session { get; private set; } = default!;
@@ -106,9 +118,19 @@ public partial class PageKrafterEditor
 
     internal PageKrafterOptions Settings => Options.Value;
 
+    /// <summary>
+    /// Exports the HTML.
+    /// </summary>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the string.</returns>
     public Task<string> ExportHtmlAsync(CancellationToken cancellationToken = default) =>
         Renderer.RenderAsync(Session.Document, RenderOptions.Export, cancellationToken);
 
+    /// <summary>
+    /// Handles the canvas message event.
+    /// </summary>
+    /// <param name="message">The message.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     [JSInvokable]
     public async Task OnCanvasMessage(CanvasMessage message)
     {
@@ -133,6 +155,10 @@ public partial class PageKrafterEditor
         }
     }
 
+    /// <summary>
+    /// Releases the resources used by this instance.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async ValueTask DisposeAsync()
     {
         if (module is not null)
@@ -276,6 +302,7 @@ public partial class PageKrafterEditor
         }
     }
 
+    /// <inheritdoc/>
     protected override async Task OnParametersSetAsync()
     {
         if (!initialized)
@@ -308,6 +335,7 @@ public partial class PageKrafterEditor
         await LoadCanvasAsync();
     }
 
+    /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)

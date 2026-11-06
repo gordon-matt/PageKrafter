@@ -8,6 +8,11 @@ namespace PageKrafter.Rendering;
 /// </summary>
 public static partial class Css
 {
+    /// <summary>
+    /// Gets the clean.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The clean.</returns>
     public static string Clean(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -23,6 +28,11 @@ public static partial class Css
             : new string(trimmed.Where(c => c is not (';' or '{' or '}' or '<' or '>' or '"' or '\\') && !char.IsControl(c)).ToArray()).Trim();
     }
 
+    /// <summary>
+    /// Gets the URL value.
+    /// </summary>
+    /// <param name="url">The URL.</param>
+    /// <returns>The URL value.</returns>
     public static string UrlValue(string? url)
     {
         string safe = Html.SafeUrl(url, allowDataImage: true);
@@ -31,11 +41,21 @@ public static partial class Css
             : $"url('{safe.Replace("'", "%27").Replace("(", "%28").Replace(")", "%29").Replace("\"", "%22").Replace("\\", "%5C")}')";
     }
 
+    /// <summary>
+    /// Gets the class names.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The class names.</returns>
     public static string ClassNames(string? value) =>
         string.IsNullOrWhiteSpace(value)
             ? string.Empty
             : string.Join(' ', value.Split(' ', StringSplitOptions.RemoveEmptyEntries).Where(name => ClassNamePattern().IsMatch(name)));
 
+    /// <summary>
+    /// Gets the identifier.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The identifier.</returns>
     public static string Identifier(string? value) =>
         !string.IsNullOrWhiteSpace(value) && IdentifierPattern().IsMatch(value.Trim()) ? value.Trim() : string.Empty;
 

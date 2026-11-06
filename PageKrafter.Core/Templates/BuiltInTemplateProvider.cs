@@ -2,16 +2,33 @@ using static PageKrafter.Templates.Nodes;
 
 namespace PageKrafter.Templates;
 
+/// <summary>
+/// Represents the built in template provider.
+/// </summary>
 public sealed class BuiltInTemplateProvider : ITemplateProvider
 {
+    /// <summary>
+    /// The layout category constant.
+    /// </summary>
     public const string LayoutCategory = "Layouts";
+    /// <summary>
+    /// The content category constant.
+    /// </summary>
     public const string ContentCategory = "Content";
+    /// <summary>
+    /// The pages category constant.
+    /// </summary>
     public const string PagesCategory = "Starter pages";
 
     private const string ShortText = "<p>Add a short description here. Double-click to edit.</p>";
 
     private static readonly Lazy<IReadOnlyList<PageTemplate>> Templates = new(Build);
 
+    /// <summary>
+    /// Gets the templates.
+    /// </summary>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the page templates.</returns>
     public Task<IReadOnlyList<PageTemplate>> GetTemplatesAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(Templates.Value);
 

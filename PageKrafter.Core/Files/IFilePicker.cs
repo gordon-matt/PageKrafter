@@ -26,9 +26,21 @@ public sealed record FilePickRequest(FilePickerKind Kind, string? Title = null, 
 /// <param name="Name">The file's name, when the file manager knows it.</param>
 public sealed record PickedFile(string Url, string? Name = null);
 
+/// <summary>
+/// Specifies the file picker kind.
+/// </summary>
 public enum FilePickerKind
 {
+    /// <summary>
+    /// The any value.
+    /// </summary>
     Any,
+    /// <summary>
+    /// The image value.
+    /// </summary>
     Image,
+    /// <summary>
+    /// The video value.
+    /// </summary>
     Video,
 }

@@ -3,8 +3,14 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace PageKrafter.Components.Panels;
 
+/// <summary>
+/// Represents the template panel.
+/// </summary>
 public partial class TemplatePanel
 {
+    /// <summary>
+    /// Gets or sets the editor.
+    /// </summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

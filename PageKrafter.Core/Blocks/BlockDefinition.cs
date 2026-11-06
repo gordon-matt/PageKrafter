@@ -11,17 +11,32 @@ public abstract class BlockDefinition
     /// <summary>Unique key stored in the JSON. Prefix host blocks (for example <c>cms.content-zone</c>) so they never clash with built-ins.</summary>
     public abstract string Type { get; }
 
+    /// <summary>
+    /// Gets the label.
+    /// </summary>
     public abstract string Label { get; }
 
+    /// <summary>
+    /// Gets the category.
+    /// </summary>
     public virtual string Category => BlockCategories.Basic;
 
     /// <summary>Inline SVG markup or a short text glyph shown in the palette and the layers panel.</summary>
     public virtual string Icon => BlockIcons.Square;
 
+    /// <summary>
+    /// Gets the description.
+    /// </summary>
     public virtual string Description => string.Empty;
 
+    /// <summary>
+    /// Gets the order.
+    /// </summary>
     public virtual int Order => 100;
 
+    /// <summary>
+    /// Gets a value indicating whether this instance is show in palette.
+    /// </summary>
     public virtual bool ShowInPalette => true;
 
     /// <summary>Web only by default, because markup that works in a browser often breaks in email clients.</summary>
@@ -30,6 +45,9 @@ public abstract class BlockDefinition
     /// <summary>Adds the shared padding, margin, colour, alignment, CSS class and visibility fields.</summary>
     public virtual bool UsesCommonStyles => true;
 
+    /// <summary>
+    /// Gets the fields.
+    /// </summary>
     public virtual IReadOnlyList<BlockField> Fields => [];
 
     /// <summary>
@@ -38,11 +56,20 @@ public abstract class BlockDefinition
     /// </summary>
     public virtual Type? EditorComponent => null;
 
+    /// <summary>
+    /// Gets the slots.
+    /// </summary>
+    /// <param name="node">The node.</param>
+    /// <returns>The slots.</returns>
     public virtual IReadOnlyList<SlotDefinition> GetSlots(BlockNode node) => [];
 
     /// <summary>Common style props this block applies itself, so the renderer must not also add them to the root element.</summary>
     public virtual IReadOnlyCollection<string> SelfAppliedStyles(DocumentMode mode) => [];
 
+    /// <summary>
+    /// Creates the value.
+    /// </summary>
+    /// <returns>The block node.</returns>
     public virtual BlockNode Create()
     {
         var node = new BlockNode { Type = Type };
@@ -64,9 +91,23 @@ public abstract class BlockDefinition
     {
     }
 
+    /// <summary>
+    /// Gets the options.
+    /// </summary>
+    /// <param name="field">The field.</param>
+    /// <param name="node">The node.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the field options.</returns>
     public virtual Task<IReadOnlyList<FieldOption>> GetOptionsAsync(BlockField field, BlockNode node, CancellationToken cancellationToken = default) =>
         Task.FromResult(field.Options);
 
+    /// <summary>
+    /// Determines whether this instance can contain.
+    /// </summary>
+    /// <param name="node">The node.</param>
+    /// <param name="slot">The slot.</param>
+    /// <param name="child">The child.</param>
+    /// <returns>true when the condition is met; otherwise, false.</returns>
     public virtual bool CanContain(BlockNode node, string slot, BlockDefinition child)
     {
         var definition = GetSlots(node).FirstOrDefault(candidate => string.Equals(candidate.Name, slot, StringComparison.Ordinal));
@@ -74,6 +115,12 @@ public abstract class BlockDefinition
             && (definition.AllowedTypes is null || definition.AllowedTypes.Contains(child.Type, StringComparer.Ordinal));
     }
 
+    /// <summary>
+    /// Determines whether this instance can be placed in.
+    /// </summary>
+    /// <param name="parent">The parent.</param>
+    /// <param name="slot">The slot.</param>
+    /// <returns>true when the condition is met; otherwise, false.</returns>
     public virtual bool CanBePlacedIn(BlockNode parent, string slot) => true;
 
     /// <summary>Short text shown next to the label in the layers panel so similar blocks can be told apart.</summary>

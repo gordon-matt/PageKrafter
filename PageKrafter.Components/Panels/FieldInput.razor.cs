@@ -2,6 +2,9 @@ using Microsoft.Extensions.Logging;
 
 namespace PageKrafter.Components.Panels;
 
+/// <summary>
+/// Represents the field input.
+/// </summary>
 public partial class FieldInput
 {
     private string? optionsKey;
@@ -9,15 +12,27 @@ public partial class FieldInput
     private string? pickError;
     private IFilePicker? picker;
 
+    /// <summary>
+    /// Gets or sets the editor.
+    /// </summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the node.
+    /// </summary>
     [Parameter, EditorRequired]
     public BlockNode Node { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the definition.
+    /// </summary>
     [Parameter, EditorRequired]
     public BlockDefinition Definition { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the field.
+    /// </summary>
     [Parameter, EditorRequired]
     public BlockField Field { get; set; } = default!;
 
@@ -64,8 +79,10 @@ public partial class FieldInput
 
     private string PreviewUrl => Html.SafeUrl(Current, allowDataImage: true);
 
+    /// <inheritdoc/>
     protected override void OnInitialized() => picker = Services.GetService<IFilePicker>();
 
+    /// <inheritdoc/>
     protected override async Task OnParametersSetAsync()
     {
         if (Field.Editor != FieldEditors.Select || !Field.HasDynamicOptions)

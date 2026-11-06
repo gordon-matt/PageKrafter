@@ -6,16 +6,46 @@ namespace PageKrafter.Rendering;
 /// </summary>
 public static class CommonStyles
 {
+    /// <summary>
+    /// The padding constant.
+    /// </summary>
     public const string Padding = "_padding";
+    /// <summary>
+    /// The margin constant.
+    /// </summary>
     public const string Margin = "_margin";
+    /// <summary>
+    /// The background constant.
+    /// </summary>
     public const string Background = "_background";
+    /// <summary>
+    /// The color constant.
+    /// </summary>
     public const string Color = "_color";
+    /// <summary>
+    /// The align constant.
+    /// </summary>
     public const string Align = "_align";
+    /// <summary>
+    /// The radius constant.
+    /// </summary>
     public const string Radius = "_radius";
+    /// <summary>
+    /// The CSS class constant.
+    /// </summary>
     public const string CssClass = "_class";
+    /// <summary>
+    /// The anchor constant.
+    /// </summary>
     public const string Anchor = "_anchor";
+    /// <summary>
+    /// The hide constant.
+    /// </summary>
     public const string Hide = "_hide";
 
+    /// <summary>
+    /// Gets the fields.
+    /// </summary>
     public static IReadOnlyList<BlockField> Fields { get; } =
     [
         BlockField.Text(Padding, "Padding", group: FieldGroups.Style) with { Placeholder = "e.g. 16px or 16px 24px" },

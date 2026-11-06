@@ -5,20 +5,28 @@ public sealed class PageBlock : BlockDefinition
 {
     private static readonly IReadOnlyList<SlotDefinition> Slots = [new(SlotDefinition.Default, "the page")];
 
+    /// <inheritdoc/>
     public override string Type => BlockTypes.Page;
 
+    /// <inheritdoc/>
     public override string Label => "Page";
 
+    /// <inheritdoc/>
     public override string Category => BlockCategories.Layout;
 
+    /// <inheritdoc/>
     public override string Icon => BlockIcons.Page;
 
+    /// <inheritdoc/>
     public override bool ShowInPalette => false;
 
+    /// <inheritdoc/>
     public override DocumentMode Modes => DocumentMode.All;
 
+    /// <inheritdoc/>
     public override bool UsesCommonStyles => false;
 
+    /// <inheritdoc/>
     public override IReadOnlyList<BlockField> Fields { get; } =
     [
         BlockField.Color("background", "Page background", group: FieldGroups.Content),
@@ -30,8 +38,10 @@ public sealed class PageBlock : BlockDefinition
         BlockField.Number("contentWidth", "Content width (px)", 600, 320, 800, 10) with { Modes = DocumentMode.Email, HelpText = "600px suits most email clients." },
     ];
 
+    /// <inheritdoc/>
     public override IReadOnlyList<SlotDefinition> GetSlots(BlockNode node) => Slots;
 
+    /// <inheritdoc/>
     public override async ValueTask<string> RenderAsync(BlockRenderContext context)
     {
         string children = await context.RenderSlotAsync();

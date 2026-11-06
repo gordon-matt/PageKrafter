@@ -3,6 +3,9 @@ namespace PageKrafter.Components.Panels;
 /// <summary>A schematic drawn from the template's block tree, so saved templates get a preview without screenshots.</summary>
 public partial class TemplateThumbnail
 {
+    /// <summary>
+    /// Gets or sets the template.
+    /// </summary>
     [Parameter, EditorRequired]
     public PageTemplate Template { get; set; } = default!;
 

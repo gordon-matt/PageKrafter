@@ -3,6 +3,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace PageKrafter;
 
+/// <summary>
+/// Provides extension methods for service collections.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection services)
@@ -50,6 +53,11 @@ public static class ServiceCollectionExtensions
             return services;
         }
 
+        /// <summary>
+        /// Adds the page krafter templates.
+        /// </summary>
+        /// <typeparam name="TProvider">The type of the provider.</typeparam>
+        /// <returns>The page krafter templates.</returns>
         public IServiceCollection AddPageKrafterTemplates<TProvider>()
             where TProvider : class, ITemplateProvider
         {
@@ -65,6 +73,11 @@ public static class ServiceCollectionExtensions
             return services;
         }
 
+        /// <summary>
+        /// Adds the page krafter JSON file templates.
+        /// </summary>
+        /// <param name="directory">The directory.</param>
+        /// <returns>The page krafter JSON file templates.</returns>
         public IServiceCollection AddPageKrafterJsonFileTemplates(string directory)
         {
             services.Replace(ServiceDescriptor.Singleton<ITemplateStore>(new JsonFileTemplateStore(directory)));

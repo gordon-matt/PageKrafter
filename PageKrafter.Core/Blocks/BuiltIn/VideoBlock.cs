@@ -2,24 +2,38 @@ using System.Text.RegularExpressions;
 
 namespace PageKrafter.Blocks.BuiltIn;
 
+/// <summary>
+/// Represents the video block.
+/// </summary>
 public sealed partial class VideoBlock : BlockDefinition
 {
+    /// <inheritdoc/>
     public override string Type => BlockTypes.Video;
 
+    /// <inheritdoc/>
     public override string Label => "Video";
 
+    /// <inheritdoc/>
     public override string Category => BlockCategories.Media;
 
+    /// <inheritdoc/>
     public override string Icon => BlockIcons.Video;
 
+    /// <inheritdoc/>
     public override int Order => 1;
 
+    /// <inheritdoc/>
     public override IReadOnlyList<BlockField> Fields { get; } =
     [
         BlockField.Url("url", "Video link") with { FilePicker = FilePickerKind.Video, HelpText = "A YouTube or Vimeo link, or a direct link to an .mp4 or .webm file." },
         BlockField.Select("aspect", "Aspect ratio", "16:9", ("16:9", "16:9"), ("4:3", "4:3"), ("1:1", "Square"), ("21:9", "21:9")),
     ];
 
+    /// <summary>
+    /// Gets the embed URL.
+    /// </summary>
+    /// <param name="url">The URL.</param>
+    /// <returns>The embed URL.</returns>
     public static string? EmbedUrl(string? url)
     {
         if (string.IsNullOrWhiteSpace(url))
@@ -37,6 +51,7 @@ public sealed partial class VideoBlock : BlockDefinition
         return vimeo.Success ? $"https://player.vimeo.com/video/{vimeo.Groups[1].Value}" : null;
     }
 
+    /// <inheritdoc/>
     public override ValueTask<string> RenderAsync(BlockRenderContext context)
     {
         string url = Html.SafeUrl(context.Value("url"));

@@ -6,16 +6,39 @@ namespace PageKrafter.Documents;
 /// </summary>
 public sealed class BlockNode
 {
+    /// <summary>
+    /// Gets or sets the identifier.
+    /// </summary>
     public string Id { get; set; } = NodeId.New();
 
+    /// <summary>
+    /// Gets or sets the type.
+    /// </summary>
     public string Type { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the props.
+    /// </summary>
     public Dictionary<string, string> Props { get; set; } = new(StringComparer.Ordinal);
 
+    /// <summary>
+    /// Gets or sets the slots.
+    /// </summary>
     public Dictionary<string, List<BlockNode>> Slots { get; set; } = new(StringComparer.Ordinal);
 
+    /// <summary>
+    /// Gets the value.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <returns>The string.</returns>
     public string? Get(string name) => Props.TryGetValue(name, out string? value) ? value : null;
 
+    /// <summary>
+    /// Sets the value.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <param name="value">The value.</param>
+    /// <returns>The block node.</returns>
     public BlockNode Set(string name, string? value)
     {
         if (value is null)
@@ -30,6 +53,11 @@ public sealed class BlockNode
         return this;
     }
 
+    /// <summary>
+    /// Gets the slot.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <returns>The slot.</returns>
     public List<BlockNode> Slot(string name)
     {
         if (!Slots.TryGetValue(name, out var children))
@@ -41,9 +69,18 @@ public sealed class BlockNode
         return children;
     }
 
+    /// <summary>
+    /// Gets the children of.
+    /// </summary>
+    /// <param name="slot">The slot.</param>
+    /// <returns>The children of.</returns>
     public IReadOnlyList<BlockNode> ChildrenOf(string slot) =>
         Slots.TryGetValue(slot, out var children) ? children : [];
 
+    /// <summary>
+    /// Gets the descendants and self.
+    /// </summary>
+    /// <returns>The descendants and self.</returns>
     public IEnumerable<BlockNode> DescendantsAndSelf()
     {
         var stack = new Stack<BlockNode>();
@@ -62,6 +99,11 @@ public sealed class BlockNode
         }
     }
 
+    /// <summary>
+    /// Clones the value.
+    /// </summary>
+    /// <param name="newIds">The new ids.</param>
+    /// <returns>The block node.</returns>
     public BlockNode Clone(bool newIds = false)
     {
         var copy = new BlockNode

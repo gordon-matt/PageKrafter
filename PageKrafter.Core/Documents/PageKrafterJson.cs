@@ -3,12 +3,27 @@ using System.Text.Json.Serialization;
 
 namespace PageKrafter.Documents;
 
+/// <summary>
+/// Provides page krafter JSON.
+/// </summary>
 public static class PageKrafterJson
 {
+    /// <summary>
+    /// Gets the options.
+    /// </summary>
     public static JsonSerializerOptions Options { get; } = Create(indented: false);
 
+    /// <summary>
+    /// Gets the indented options.
+    /// </summary>
     public static JsonSerializerOptions IndentedOptions { get; } = Create(indented: true);
 
+    /// <summary>
+    /// Serializes the value.
+    /// </summary>
+    /// <param name="document">The document.</param>
+    /// <param name="indented">The indented.</param>
+    /// <returns>The string.</returns>
     public static string Serialize(PageDocument document, bool indented = false) =>
         JsonSerializer.Serialize(document, indented ? IndentedOptions : Options);
 

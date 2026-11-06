@@ -10,6 +10,7 @@ namespace PageKrafter.Components;
 public abstract class ComponentBlockDefinition<TComponent> : BlockDefinition
     where TComponent : BlockComponentBase
 {
+    /// <inheritdoc/>
     public override async ValueTask<string> RenderAsync(BlockRenderContext context)
     {
         var slots = new Dictionary<string, MarkupString>(StringComparer.Ordinal);
@@ -27,25 +28,56 @@ public abstract class ComponentBlockDefinition<TComponent> : BlockDefinition
     }
 }
 
+/// <summary>
+/// Represents the block component base.
+/// </summary>
 public abstract class BlockComponentBase : ComponentBase
 {
+    /// <summary>
+    /// Gets or sets the context.
+    /// </summary>
     [Parameter]
     public BlockRenderContext Context { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the slots.
+    /// </summary>
     [Parameter]
     public IReadOnlyDictionary<string, MarkupString> Slots { get; set; } = new Dictionary<string, MarkupString>();
 
+    /// <summary>
+    /// Gets a value indicating whether this instance is editor.
+    /// </summary>
     protected bool IsEditor => Context.IsEditor;
 
+    /// <summary>
+    /// Gets a value indicating whether this instance is email.
+    /// </summary>
     protected bool IsEmail => Context.IsEmail;
 
+    /// <summary>
+    /// Gets the value.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <returns>The value.</returns>
     protected string Value(string name) => Context.Value(name);
 
+    /// <summary>
+    /// Gets the slot.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <returns>The slot.</returns>
     protected MarkupString Slot(string name = SlotDefinition.Default) => Slots.TryGetValue(name, out var html) ? html : default;
 
     /// <summary>Spread onto the element that holds a slot: <c>&lt;div @attributes="SlotAttributes()"&gt;@Slot()&lt;/div&gt;</c>.</summary>
     protected IReadOnlyDictionary<string, object> SlotAttributes(string name = SlotDefinition.Default) => Context.SlotAttributeMap(name);
 
+    /// <summary>
+    /// Gets the editable.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <param name="rich">The rich.</param>
+    /// <returns>The editable.</returns>
     protected IReadOnlyDictionary<string, object> Editable(string name, bool rich = false) => Context.EditableAttributeMap(name, rich);
 }
 
@@ -54,6 +86,12 @@ public sealed class BlockComponentRenderer(IServiceProvider services, ILoggerFac
 {
     private HtmlRenderer? renderer;
 
+    /// <summary>
+    /// Renders the value.
+    /// </summary>
+    /// <param name="componentType">The component type.</param>
+    /// <param name="parameters">The parameters.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the string.</returns>
     public async Task<string> RenderAsync(Type componentType, IDictionary<string, object?> parameters)
     {
         renderer ??= new HtmlRenderer(services, loggerFactory);
@@ -65,6 +103,10 @@ public sealed class BlockComponentRenderer(IServiceProvider services, ILoggerFac
         });
     }
 
+    /// <summary>
+    /// Releases the resources used by this instance.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async ValueTask DisposeAsync()
     {
         if (renderer is not null)

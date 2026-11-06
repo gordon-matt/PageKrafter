@@ -1,9 +1,15 @@
 namespace PageKrafter.Components.Panels;
 
+/// <summary>
+/// Represents the inspector.
+/// </summary>
 public partial class Inspector
 {
     private static readonly string[] GroupOrder = [FieldGroups.Content, FieldGroups.Style, FieldGroups.Advanced];
 
+    /// <summary>
+    /// Gets or sets the editor.
+    /// </summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

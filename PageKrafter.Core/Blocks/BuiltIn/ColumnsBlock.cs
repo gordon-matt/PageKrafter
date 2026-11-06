@@ -1,7 +1,13 @@
 namespace PageKrafter.Blocks.BuiltIn;
 
+/// <summary>
+/// Represents the columns block.
+/// </summary>
 public sealed class ColumnsBlock : BlockDefinition
 {
+    /// <summary>
+    /// The max columns constant.
+    /// </summary>
     public const int MaxColumns = 6;
 
     private static readonly Dictionary<int, (string Value, string Label)[]> Presets = new()
@@ -11,20 +17,28 @@ public sealed class ColumnsBlock : BlockDefinition
         [4] = [("1:1:1:1", "Equal"), ("2:1:1:2", "Wide outsides"), ("1:2:2:1", "Wide insides")],
     };
 
+    /// <inheritdoc/>
     public override string Type => BlockTypes.Columns;
 
+    /// <inheritdoc/>
     public override string Label => "Columns";
 
+    /// <inheritdoc/>
     public override string Category => BlockCategories.Layout;
 
+    /// <inheritdoc/>
     public override string Icon => BlockIcons.Columns;
 
+    /// <inheritdoc/>
     public override string Description => "Side-by-side columns that stack on phones.";
 
+    /// <inheritdoc/>
     public override int Order => 1;
 
+    /// <inheritdoc/>
     public override DocumentMode Modes => DocumentMode.All;
 
+    /// <inheritdoc/>
     public override IReadOnlyList<BlockField> Fields { get; } =
     [
         BlockField.Select("count", "Columns", "2", ("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5"), ("6", "6")),
@@ -41,9 +55,19 @@ public sealed class ColumnsBlock : BlockDefinition
         BlockField.Checkbox("stackOnMobile", "Stack on mobile", defaultValue: true) with { Modes = DocumentMode.Web },
     ];
 
+    /// <summary>
+    /// Counts of.
+    /// </summary>
+    /// <param name="node">The node.</param>
+    /// <returns>The int.</returns>
     public static int CountOf(BlockNode node) =>
         int.TryParse(node.Get("count"), NumberStyles.Integer, CultureInfo.InvariantCulture, out int count) ? Math.Clamp(count, 1, MaxColumns) : 2;
 
+    /// <summary>
+    /// Gets the slot name.
+    /// </summary>
+    /// <param name="index">The zero-based index.</param>
+    /// <returns>The slot name.</returns>
     public static string SlotName(int index) => $"col-{index + 1}";
 
     /// <summary>Reads a ratio like <c>1:2</c>. Anything that doesn't match the column count gives equal widths.</summary>
@@ -57,9 +81,11 @@ public sealed class ColumnsBlock : BlockDefinition
         return ratios.Length == count && ratios.All(ratio => ratio > 0) ? ratios : Enumerable.Repeat(1m, count).ToArray();
     }
 
+    /// <inheritdoc/>
     public override IReadOnlyList<SlotDefinition> GetSlots(BlockNode node) =>
         Enumerable.Range(0, CountOf(node)).Select(index => new SlotDefinition(SlotName(index), $"Column {index + 1}")).ToArray();
 
+    /// <inheritdoc/>
     public override Task<IReadOnlyList<FieldOption>> GetOptionsAsync(BlockField field, BlockNode node, CancellationToken cancellationToken = default)
     {
         if (field.Name != "widths")
@@ -83,6 +109,7 @@ public sealed class ColumnsBlock : BlockDefinition
         return Task.FromResult<IReadOnlyList<FieldOption>>(options);
     }
 
+    /// <inheritdoc/>
     public override void OnPropertyChanged(BlockNode node, string name)
     {
         if (name != "count")
@@ -110,6 +137,7 @@ public sealed class ColumnsBlock : BlockDefinition
         }
     }
 
+    /// <inheritdoc/>
     public override async ValueTask<string> RenderAsync(BlockRenderContext context)
     {
         int count = CountOf(context.Node);

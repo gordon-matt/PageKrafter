@@ -1,17 +1,26 @@
 namespace PageKrafter.Blocks.BuiltIn;
 
+/// <summary>
+/// Represents the button block.
+/// </summary>
 public sealed class ButtonBlock : BlockDefinition
 {
+    /// <inheritdoc/>
     public override string Type => BlockTypes.Button;
 
+    /// <inheritdoc/>
     public override string Label => "Button";
 
+    /// <inheritdoc/>
     public override string Icon => BlockIcons.Button;
 
+    /// <inheritdoc/>
     public override int Order => 2;
 
+    /// <inheritdoc/>
     public override DocumentMode Modes => DocumentMode.All;
 
+    /// <inheritdoc/>
     public override IReadOnlyList<BlockField> Fields { get; } =
     [
         BlockField.Text("text", "Text", "Learn more"),
@@ -24,8 +33,10 @@ public sealed class ButtonBlock : BlockDefinition
         BlockField.Text("buttonRadius", "Button corner radius", "6px", FieldGroups.Style),
     ];
 
+    /// <inheritdoc/>
     public override string Summarize(BlockNode node) => Html.Truncate(node.Get("text") ?? string.Empty, 32);
 
+    /// <inheritdoc/>
     public override ValueTask<string> RenderAsync(BlockRenderContext context)
     {
         string href = Html.Encode(Html.SafeUrl(context.Value("url")) is { Length: > 0 } url ? url : "#");

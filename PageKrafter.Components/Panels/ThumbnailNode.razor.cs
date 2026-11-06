@@ -1,13 +1,22 @@
 namespace PageKrafter.Components.Panels;
 
+/// <summary>
+/// Represents the thumbnail node.
+/// </summary>
 public partial class ThumbnailNode
 {
     private const int MaxDepth = 4;
     private const int MaxChildren = 5;
 
+    /// <summary>
+    /// Gets or sets the node.
+    /// </summary>
     [Parameter, EditorRequired]
     public BlockNode Node { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the depth.
+    /// </summary>
     [Parameter]
     public int Depth { get; set; }
 

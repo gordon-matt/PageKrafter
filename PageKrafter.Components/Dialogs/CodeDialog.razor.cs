@@ -1,10 +1,16 @@
 namespace PageKrafter.Components.Dialogs;
 
+/// <summary>
+/// Represents the code dialog.
+/// </summary>
 public partial class CodeDialog
 {
     private bool open;
     private string html = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the editor.
+    /// </summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

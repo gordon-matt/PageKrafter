@@ -15,10 +15,21 @@ public sealed class EditHistory(int limit = 100, TimeProvider? timeProvider = nu
     private string? lastKey;
     private DateTimeOffset lastAt;
 
+    /// <summary>
+    /// Gets a value indicating whether this instance can undo.
+    /// </summary>
     public bool CanUndo => undo.Count > 0;
 
+    /// <summary>
+    /// Gets a value indicating whether this instance can redo.
+    /// </summary>
     public bool CanRedo => redo.Count > 0;
 
+    /// <summary>
+    /// Performs the record operation.
+    /// </summary>
+    /// <param name="snapshot">The snapshot.</param>
+    /// <param name="coalesceKey">The coalesce key.</param>
     public void Record(string snapshot, string? coalesceKey = null)
     {
         var now = time.GetUtcNow();
@@ -42,6 +53,11 @@ public sealed class EditHistory(int limit = 100, TimeProvider? timeProvider = nu
         }
     }
 
+    /// <summary>
+    /// Gets the undo.
+    /// </summary>
+    /// <param name="current">The current.</param>
+    /// <returns>The undo.</returns>
     public string? Undo(string current)
     {
         if (undo.Last is not { } last)
@@ -55,6 +71,11 @@ public sealed class EditHistory(int limit = 100, TimeProvider? timeProvider = nu
         return last.Value;
     }
 
+    /// <summary>
+    /// Gets the redo.
+    /// </summary>
+    /// <param name="current">The current.</param>
+    /// <returns>The redo.</returns>
     public string? Redo(string current)
     {
         if (!redo.TryPop(out string? next))
@@ -67,6 +88,9 @@ public sealed class EditHistory(int limit = 100, TimeProvider? timeProvider = nu
         return next;
     }
 
+    /// <summary>
+    /// Clears the value.
+    /// </summary>
     public void Clear()
     {
         undo.Clear();

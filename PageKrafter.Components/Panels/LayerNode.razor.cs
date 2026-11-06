@@ -2,16 +2,28 @@ using System.Text.Json;
 
 namespace PageKrafter.Components.Panels;
 
+/// <summary>
+/// Represents the layer node.
+/// </summary>
 public partial class LayerNode
 {
     private bool expanded = true;
 
+    /// <summary>
+    /// Gets or sets the editor.
+    /// </summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the node.
+    /// </summary>
     [Parameter, EditorRequired]
     public BlockNode Node { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the depth.
+    /// </summary>
     [Parameter]
     public int Depth { get; set; }
 

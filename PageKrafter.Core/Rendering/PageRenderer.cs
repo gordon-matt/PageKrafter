@@ -1,5 +1,8 @@
 namespace PageKrafter.Rendering;
 
+/// <summary>
+/// Represents the page renderer.
+/// </summary>
 public sealed class PageRenderer(BlockRegistry registry, IHtmlContentSanitizer sanitizer, IServiceProvider services)
 {
     private const int MaxDepth = 48;

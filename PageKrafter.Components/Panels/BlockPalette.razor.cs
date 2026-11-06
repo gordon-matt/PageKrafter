@@ -3,10 +3,16 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace PageKrafter.Components.Panels;
 
+/// <summary>
+/// Represents the block palette.
+/// </summary>
 public partial class BlockPalette
 {
     private string search = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the editor.
+    /// </summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

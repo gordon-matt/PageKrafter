@@ -1,5 +1,8 @@
 namespace PageKrafter.Rendering;
 
+/// <summary>
+/// Provides HTML.
+/// </summary>
 public static class Html
 {
     private static readonly string[] AllowedSchemes = ["http", "https", "mailto", "tel"];
@@ -59,6 +62,11 @@ public static class Html
             : string.Empty;
     }
 
+    /// <summary>
+    /// Gets the strip tags.
+    /// </summary>
+    /// <param name="html">The HTML.</param>
+    /// <returns>The strip tags.</returns>
     public static string StripTags(string? html)
     {
         if (string.IsNullOrEmpty(html))
@@ -88,6 +96,12 @@ public static class Html
         return System.Net.WebUtility.HtmlDecode(string.Join(' ', builder.ToString().Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)));
     }
 
+    /// <summary>
+    /// Truncates the value.
+    /// </summary>
+    /// <param name="text">The text.</param>
+    /// <param name="length">The length.</param>
+    /// <returns>The string.</returns>
     public static string Truncate(string text, int length) =>
         text.Length <= length ? text : string.Concat(text.AsSpan(0, length - 1).TrimEnd(), "…");
 }

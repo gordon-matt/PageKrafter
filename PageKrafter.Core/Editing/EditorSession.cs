@@ -11,6 +11,14 @@ public sealed class EditorSession
     private readonly EditHistory history;
     private readonly Func<BlockDefinition, bool>? filter;
 
+    /// <summary>
+    /// Initializes a new instance of the EditorSession class.
+    /// </summary>
+    /// <param name="registry">The registry.</param>
+    /// <param name="document">The document.</param>
+    /// <param name="historyLimit">The history limit.</param>
+    /// <param name="filter">The filter.</param>
+    /// <param name="timeProvider">The time provider.</param>
     public EditorSession(
         BlockRegistry registry,
         PageDocument document,
@@ -24,21 +32,45 @@ public sealed class EditorSession
         Document = document;
     }
 
+    /// <summary>
+    /// Gets or sets the document.
+    /// </summary>
     public PageDocument Document { get; private set; }
 
+    /// <summary>
+    /// Gets or sets the selected identifier.
+    /// </summary>
     public string? SelectedId { get; private set; }
 
+    /// <summary>
+    /// Gets the selected.
+    /// </summary>
     public BlockNode? Selected => Document.Find(SelectedId);
 
+    /// <summary>
+    /// Gets a value indicating whether this instance can undo.
+    /// </summary>
     public bool CanUndo => history.CanUndo;
 
+    /// <summary>
+    /// Gets a value indicating whether this instance can redo.
+    /// </summary>
     public bool CanRedo => history.CanRedo;
 
+    /// <summary>
+    /// Determines whether this instance is allowed.
+    /// </summary>
+    /// <param name="definition">The definition.</param>
+    /// <returns>true when the condition is met; otherwise, false.</returns>
     public bool IsAllowed(BlockDefinition definition) =>
         definition.Type != BlockTypes.Page
         && definition.Modes.HasFlag(Document.Mode)
         && (filter?.Invoke(definition) ?? true);
 
+    /// <summary>
+    /// Loads the value.
+    /// </summary>
+    /// <param name="document">The document.</param>
     public void Load(PageDocument document)
     {
         Document = document;
@@ -46,8 +78,20 @@ public sealed class EditorSession
         history.Clear();
     }
 
+    /// <summary>
+    /// Selects the value.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
     public void Select(string? id) => SelectedId = Document.Find(id) is not null ? id : null;
 
+    /// <summary>
+    /// Inserts the value.
+    /// </summary>
+    /// <param name="blockType">The block type.</param>
+    /// <param name="parentId">The parent identifier.</param>
+    /// <param name="slot">The slot.</param>
+    /// <param name="index">The zero-based index.</param>
+    /// <returns>The outcome for the string.</returns>
     public Result<string> Insert(string blockType, string parentId, string slot, int index)
     {
         var definition = registry.Find(blockType);
@@ -56,6 +100,14 @@ public sealed class EditorSession
             : InsertNode(definition.Create(), parentId, slot, index);
     }
 
+    /// <summary>
+    /// Inserts the template.
+    /// </summary>
+    /// <param name="template">The template.</param>
+    /// <param name="parentId">The parent identifier.</param>
+    /// <param name="slot">The slot.</param>
+    /// <param name="index">The zero-based index.</param>
+    /// <returns>The outcome for the string.</returns>
     public Result<string> InsertTemplate(PageTemplate template, string parentId, string slot, int index)
     {
         string? error = TemplateError(template);
@@ -71,12 +123,25 @@ public sealed class EditorSession
             : InsertNear(definition.Create());
     }
 
+    /// <summary>
+    /// Inserts the template near selection.
+    /// </summary>
+    /// <param name="template">The template.</param>
+    /// <returns>The outcome for the string.</returns>
     public Result<string> InsertTemplateNearSelection(PageTemplate template)
     {
         string? error = TemplateError(template);
         return error is null ? InsertNear(template.Instantiate()) : Invalid<string>(error);
     }
 
+    /// <summary>
+    /// Moves the value.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <param name="parentId">The parent identifier.</param>
+    /// <param name="slot">The slot.</param>
+    /// <param name="index">The zero-based index.</param>
+    /// <returns>The result.</returns>
     public Result Move(string id, string parentId, string slot, int index)
     {
         var location = Document.Locate(id);
@@ -116,6 +181,12 @@ public sealed class EditorSession
         return Result.Success();
     }
 
+    /// <summary>
+    /// Moves by.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <param name="offset">The offset.</param>
+    /// <returns>The result.</returns>
     public Result MoveBy(string id, int offset)
     {
         var location = Document.Locate(id);
@@ -141,6 +212,11 @@ public sealed class EditorSession
         return Result.Success();
     }
 
+    /// <summary>
+    /// Deletes the value.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <returns>The result.</returns>
     public Result Delete(string id)
     {
         var location = Document.Locate(id);
@@ -158,6 +234,11 @@ public sealed class EditorSession
         return Result.Success();
     }
 
+    /// <summary>
+    /// Duplicates the value.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <returns>The outcome for the string.</returns>
     public Result<string> Duplicate(string id)
     {
         var location = Document.Locate(id);
@@ -172,6 +253,13 @@ public sealed class EditorSession
         return Result<string>.Success(copy.Id);
     }
 
+    /// <summary>
+    /// Sets the prop.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="value">The value.</param>
+    /// <returns>The prop.</returns>
     public Result SetProp(string id, string name, string value)
     {
         var node = Document.Find(id);
@@ -194,6 +282,11 @@ public sealed class EditorSession
         return Result.Success();
     }
 
+    /// <summary>
+    /// Applies the page template.
+    /// </summary>
+    /// <param name="template">The template.</param>
+    /// <returns>The page template.</returns>
     public Result ApplyPageTemplate(PageTemplate template)
     {
         if (template.Kind != TemplateKind.Page)
@@ -211,10 +304,23 @@ public sealed class EditorSession
         return Result.Success();
     }
 
+    /// <summary>
+    /// Gets the undo.
+    /// </summary>
+    /// <returns>true when the condition is met; otherwise, false.</returns>
     public bool Undo() => Restore(history.Undo(Snapshot()));
 
+    /// <summary>
+    /// Gets the redo.
+    /// </summary>
+    /// <returns>true when the condition is met; otherwise, false.</returns>
     public bool Redo() => Restore(history.Redo(Snapshot()));
 
+    /// <summary>
+    /// Gets the parent identifier.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <returns>The parent identifier.</returns>
     public string? ParentId(string id) => Document.Locate(id)?.Parent.Id;
 
     private Result<string> InsertNear(BlockNode node)

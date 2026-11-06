@@ -8,8 +8,16 @@ public sealed partial class JsonFileTemplateStore(string directory) : ITemplateS
 {
     private readonly SemaphoreSlim gate = new(1, 1);
 
+    /// <summary>
+    /// Gets the directory.
+    /// </summary>
     public string Directory { get; } = directory;
 
+    /// <summary>
+    /// Lists the value.
+    /// </summary>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the page templates.</returns>
     public async Task<IReadOnlyList<PageTemplate>> ListAsync(CancellationToken cancellationToken = default)
     {
         if (!System.IO.Directory.Exists(Directory))
@@ -30,12 +38,24 @@ public sealed partial class JsonFileTemplateStore(string directory) : ITemplateS
         return templates;
     }
 
+    /// <summary>
+    /// Finds the value.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the page template.</returns>
     public async Task<PageTemplate?> FindAsync(string id, CancellationToken cancellationToken = default)
     {
         string? path = PathFor(id);
         return path is not null && File.Exists(path) ? await ReadAsync(path, cancellationToken) : null;
     }
 
+    /// <summary>
+    /// Saves the value.
+    /// </summary>
+    /// <param name="template">The template.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task SaveAsync(PageTemplate template, CancellationToken cancellationToken = default)
     {
         string path = PathFor(template.Id) ?? throw new ArgumentException($"\"{template.Id}\" is not a valid template id.", nameof(template));
@@ -53,6 +73,12 @@ public sealed partial class JsonFileTemplateStore(string directory) : ITemplateS
         }
     }
 
+    /// <summary>
+    /// Deletes the value.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is true when the condition is met; otherwise, false.</returns>
     public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
         string? path = PathFor(id);

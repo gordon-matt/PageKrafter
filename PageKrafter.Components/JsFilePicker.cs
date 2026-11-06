@@ -11,6 +11,12 @@ namespace PageKrafter.Components;
 /// </remarks>
 public class JsFilePicker(IJSRuntime js, string function) : IFilePicker
 {
+    /// <summary>
+    /// Gets the pick.
+    /// </summary>
+    /// <param name="request">The request.</param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the picked file.</returns>
     public virtual async ValueTask<PickedFile?> PickAsync(FilePickRequest request, CancellationToken cancellationToken = default)
     {
         var picked = await js.InvokeAsync<PickedFile?>(function, cancellationToken, CreateArgument(request));

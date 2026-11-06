@@ -3,26 +3,59 @@ namespace PageKrafter.Components;
 /// <summary>A message from the canvas iframe, relayed by pagekrafter.js. One flat shape keeps the JS side simple.</summary>
 public sealed record CanvasMessage
 {
+    /// <summary>
+    /// Gets or sets the type.
+    /// </summary>
     public string Type { get; init; } = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the identifier.
+    /// </summary>
     public string? Id { get; init; }
 
+    /// <summary>
+    /// Gets or sets the parent identifier.
+    /// </summary>
     public string? ParentId { get; init; }
 
+    /// <summary>
+    /// Gets or sets the slot.
+    /// </summary>
     public string? Slot { get; init; }
 
+    /// <summary>
+    /// Gets or sets the index.
+    /// </summary>
     public int Index { get; init; }
 
+    /// <summary>
+    /// Gets or sets the kind.
+    /// </summary>
     public string? Kind { get; init; }
 
+    /// <summary>
+    /// Gets or sets the block type.
+    /// </summary>
     public string? BlockType { get; init; }
 
+    /// <summary>
+    /// Gets or sets the template identifier.
+    /// </summary>
     public string? TemplateId { get; init; }
 
+    /// <summary>
+    /// Gets or sets the prop.
+    /// </summary>
     public string? Prop { get; init; }
 
+    /// <summary>
+    /// Gets or sets the value.
+    /// </summary>
     public string? Value { get; init; }
 
+    /// <summary>
+    /// Gets or sets the command.
+    /// </summary>
     public string? Command { get; init; }
 }
 

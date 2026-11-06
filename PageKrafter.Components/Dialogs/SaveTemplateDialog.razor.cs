@@ -1,5 +1,8 @@
 namespace PageKrafter.Components.Dialogs;
 
+/// <summary>
+/// Represents the save template dialog.
+/// </summary>
 public partial class SaveTemplateDialog
 {
     private bool open;
@@ -11,6 +14,9 @@ public partial class SaveTemplateDialog
     private string description = string.Empty;
     private string? error;
 
+    /// <summary>
+    /// Gets or sets the editor.
+    /// </summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

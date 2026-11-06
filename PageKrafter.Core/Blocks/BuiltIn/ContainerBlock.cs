@@ -5,20 +5,28 @@ public sealed class ContainerBlock : BlockDefinition
 {
     private static readonly IReadOnlyList<SlotDefinition> Slots = [new(SlotDefinition.Default, "this box")];
 
+    /// <inheritdoc/>
     public override string Type => BlockTypes.Container;
 
+    /// <inheritdoc/>
     public override string Label => "Box";
 
+    /// <inheritdoc/>
     public override string Category => BlockCategories.Layout;
 
+    /// <inheritdoc/>
     public override string Icon => BlockIcons.Container;
 
+    /// <inheritdoc/>
     public override string Description => "Groups blocks so they can share a background or border.";
 
+    /// <inheritdoc/>
     public override int Order => 2;
 
+    /// <inheritdoc/>
     public override DocumentMode Modes => DocumentMode.All;
 
+    /// <inheritdoc/>
     public override IReadOnlyList<BlockField> Fields { get; } =
     [
         BlockField.Select("tag", "Element", "div", ("div", "div"), ("article", "article"), ("aside", "aside"), ("header", "header"), ("footer", "footer"), ("nav", "nav")) with { Modes = DocumentMode.Web, Group = FieldGroups.Advanced },
@@ -27,13 +35,17 @@ public sealed class ContainerBlock : BlockDefinition
         BlockField.Text("shadow", "Shadow", group: FieldGroups.Style) with { Placeholder = "e.g. 0 4px 16px rgba(0,0,0,.08)", Modes = DocumentMode.Web },
     ];
 
+    /// <inheritdoc/>
     public override IReadOnlyList<SlotDefinition> GetSlots(BlockNode node) => Slots;
 
+    /// <inheritdoc/>
     public override IReadOnlyCollection<string> SelfAppliedStyles(DocumentMode mode) =>
         mode == DocumentMode.Email ? EmailMarkup.CellStyles : [];
 
+    /// <inheritdoc/>
     public override BlockNode Create() => base.Create().Set(CommonStyles.Padding, "16px");
 
+    /// <inheritdoc/>
     public override async ValueTask<string> RenderAsync(BlockRenderContext context)
     {
         string children = await context.RenderSlotAsync();

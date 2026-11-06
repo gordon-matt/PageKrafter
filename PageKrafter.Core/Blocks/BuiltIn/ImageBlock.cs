@@ -1,22 +1,32 @@
 namespace PageKrafter.Blocks.BuiltIn;
 
+/// <summary>
+/// Represents the image block.
+/// </summary>
 public sealed class ImageBlock : BlockDefinition
 {
     private const string Placeholder =
         "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360' viewBox='0 0 640 360'%3E%3Crect width='640' height='360' fill='%23e2e8f0'/%3E%3Cpath d='M250 230l50-60 40 45 30-30 60 45z' fill='%2394a3b8'/%3E%3Ccircle cx='275' cy='140' r='18' fill='%2394a3b8'/%3E%3C/svg%3E";
 
+    /// <inheritdoc/>
     public override string Type => BlockTypes.Image;
 
+    /// <inheritdoc/>
     public override string Label => "Image";
 
+    /// <inheritdoc/>
     public override string Category => BlockCategories.Media;
 
+    /// <inheritdoc/>
     public override string Icon => BlockIcons.Image;
 
+    /// <inheritdoc/>
     public override int Order => 0;
 
+    /// <inheritdoc/>
     public override DocumentMode Modes => DocumentMode.All;
 
+    /// <inheritdoc/>
     public override IReadOnlyList<BlockField> Fields { get; } =
     [
         BlockField.Image("src", "Image"),
@@ -27,10 +37,13 @@ public sealed class ImageBlock : BlockDefinition
         BlockField.Text("caption", "Caption") with { Modes = DocumentMode.Web },
     ];
 
+    /// <inheritdoc/>
     public override BlockNode Create() => base.Create().Set(CommonStyles.Align, "center");
 
+    /// <inheritdoc/>
     public override string Summarize(BlockNode node) => Html.Truncate(node.Get("alt") is { Length: > 0 } alt ? alt : Path.GetFileName(node.Get("src") ?? string.Empty), 32);
 
+    /// <inheritdoc/>
     public override ValueTask<string> RenderAsync(BlockRenderContext context)
     {
         string src = Html.SafeUrl(context.Value("src"), allowDataImage: true);
