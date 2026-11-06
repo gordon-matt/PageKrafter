@@ -23,7 +23,7 @@ public sealed class HeadingBlock : BlockDefinition
     /// <inheritdoc/>
     public override IReadOnlyList<BlockField> Fields { get; } =
     [
-        BlockField.Text("text", "Text", "Your heading here") with { HelpText = "You can also double-click the heading on the page." },
+        BlockField.Text("text", "Text", "Your heading here") with { HelpText = "You can also double-click the heading on the page.", AcceptsTokens = true },
         BlockField.Select("level", "Level", "h2", ("h1", "Heading 1"), ("h2", "Heading 2"), ("h3", "Heading 3"), ("h4", "Heading 4"), ("h5", "Heading 5"), ("h6", "Heading 6")),
     ];
 

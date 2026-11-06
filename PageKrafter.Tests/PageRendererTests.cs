@@ -127,6 +127,27 @@ public class PageRendererTests
         Assert.Contains(".pk-columns", html);
     }
 
+    [Fact]
+    public async Task Editor_marks_token_fields_and_leaves_other_text_alone()
+    {
+        string heading = await RenderAsync(TestHost.Page(Nodes.Heading("Hello")), RenderOptions.Editor);
+        string button = await RenderAsync(TestHost.Page(Nodes.Button("Go")), RenderOptions.Editor);
+
+        Assert.Contains("data-pk-token=\"\"", heading);
+        Assert.DoesNotContain("data-pk-token", button);
+    }
+
+    [Fact]
+    public void Text_heading_and_html_accept_tokens()
+    {
+        var registry = TestHost.Registry();
+
+        Assert.Contains(registry.Find(BlockTypes.Heading)!.Fields, field => field.Name == "text" && field.AcceptsTokens);
+        Assert.Contains(registry.Find(BlockTypes.Text)!.Fields, field => field.Name == "content" && field.AcceptsTokens);
+        Assert.Contains(registry.Find(BlockTypes.Html)!.Fields, field => field.Name == "html" && field.AcceptsTokens);
+        Assert.DoesNotContain(registry.Find(BlockTypes.Button)!.Fields, field => field.AcceptsTokens);
+    }
+
     private static Task<string> RenderAsync(PageDocument document, RenderOptions options) =>
         TestHost.Create().GetRequiredService<PageRenderer>().RenderAsync(document, options with { IncludeBaseStyles = false });
 

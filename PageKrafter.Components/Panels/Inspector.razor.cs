@@ -7,6 +7,8 @@ public partial class Inspector
 {
     private static readonly string[] GroupOrder = [FieldGroups.Content, FieldGroups.Style, FieldGroups.Advanced];
 
+    private bool tokensOpen;
+
     /// <summary>
     /// Gets or sets the editor.
     /// </summary>
@@ -14,6 +16,29 @@ public partial class Inspector
     public PageKrafterEditor Editor { get; set; } = default!;
 
     private BlockNode? Node => Editor.Session.Selected;
+
+    private bool ShowTokenButton =>
+        Node is not null
+        && Editor.Session.Document.Mode == DocumentMode.Email
+        && Editor.TokenChoices.Count > 0
+        && Definition?.Fields.Any(candidate => candidate.AcceptsTokens) == true;
+
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        if (tokensOpen && !ShowTokenButton)
+        {
+            tokensOpen = false;
+            _ = Editor.ReleaseTokenCaretAsync();
+        }
+    }
+
+    private void ToggleTokens() => tokensOpen = !tokensOpen;
+
+    private async Task InsertTokenAsync(EditorToken token)
+    {
+        await Editor.InsertTokenAsync(token);
+    }
 
     private BlockDefinition? Definition => Editor.Blocks.Find(Node?.Type);
 

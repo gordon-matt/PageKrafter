@@ -27,6 +27,7 @@ public sealed class HtmlBlock : BlockDefinition
         BlockField.Html("html", "HTML", """<div style="padding:16px;border:1px dashed #94a3b8;text-align:center">Custom HTML</div>""") with
         {
             HelpText = "Scripts, iframes and event handlers are removed.",
+            AcceptsTokens = true,
         },
     ];
 

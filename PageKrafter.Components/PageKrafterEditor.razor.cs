@@ -32,6 +32,8 @@ public partial class PageKrafterEditor
     private bool saving;
     private SaveTemplateDialog saveDialog = default!;
     private CodeDialog codeDialog = default!;
+    private string? pendingCaretId;
+    private int pendingCaret;
 
     /// <summary>The document as JSON. Empty starts a new document in <see cref="Mode"/>.</summary>
     [Parameter]
@@ -75,6 +77,13 @@ public partial class PageKrafterEditor
     [Parameter]
     public RenderFragment? ToolbarContent { get; set; }
 
+    /// <summary>
+    /// Placeholders offered while editing an email. Empty hides the token button.
+    /// PageKrafter inserts each <see cref="EditorToken.Value"/> as text and does not know how the host replaces it.
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<EditorToken>? Tokens { get; set; }
+
     [Inject]
     private BlockRegistry Registry { get; set; } = default!;
 
@@ -117,6 +126,11 @@ public partial class PageKrafterEditor
     internal IReadOnlyList<PageTemplate> Templates { get; private set; } = [];
 
     internal PageKrafterOptions Settings => Options.Value;
+
+    internal IReadOnlyList<EditorToken> TokenChoices =>
+        Tokens is null
+            ? []
+            : Tokens.Where(token => token is not null && !string.IsNullOrWhiteSpace(token.Value)).ToArray();
 
     /// <summary>
     /// Exports the HTML.
@@ -338,15 +352,126 @@ public partial class PageKrafterEditor
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
+        if (firstRender)
+        {
+            reference = DotNetObjectReference.Create(this);
+            module = await Js.InvokeAsync<IJSObjectReference>("import", CanvasDocument.ModuleUrl);
+            await module.InvokeVoidAsync("mount", host, frame, reference);
+            await LoadCanvasAsync();
+        }
+
+        if (pendingCaretId is not null && module is not null)
+        {
+            string elementId = pendingCaretId;
+            int caret = pendingCaret;
+            pendingCaretId = null;
+            try
+            {
+                await module.InvokeVoidAsync("restoreCaret", elementId, caret);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+
+    internal async Task ReleaseTokenCaretAsync()
+    {
+        if (module is null)
         {
             return;
         }
 
-        reference = DotNetObjectReference.Create(this);
-        module = await Js.InvokeAsync<IJSObjectReference>("import", CanvasDocument.ModuleUrl);
-        await module.InvokeVoidAsync("mount", host, frame, reference);
-        await LoadCanvasAsync();
+        try
+        {
+            await module.InvokeVoidAsync("releaseTokenCaret", frame);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    internal async Task InsertTokenAsync(EditorToken token)
+    {
+        if (module is null || string.IsNullOrEmpty(token.Value))
+        {
+            return;
+        }
+
+        TokenCaret? target;
+        try
+        {
+            target = await module.InvokeAsync<TokenCaret?>("peekTokenTarget", frame);
+        }
+        catch (JSDisconnectedException)
+        {
+            return;
+        }
+
+        if (target is null)
+        {
+            Toasts.Warning("Click into the heading, text, or HTML first, then choose a token.");
+            return;
+        }
+
+        if (string.Equals(target.Kind, "canvas", StringComparison.Ordinal))
+        {
+            bool inserted = await module.InvokeAsync<bool>("insertCanvasToken", frame, token.Value);
+            if (inserted || await InsertIntoFieldAsync(target, token.Value))
+            {
+                return;
+            }
+        }
+        else if (await InsertIntoFieldAsync(target, token.Value))
+        {
+            return;
+        }
+
+        Toasts.Warning("Click into the heading, text, or HTML first, then choose a token.");
+    }
+
+    private async Task<bool> InsertIntoFieldAsync(TokenCaret target, string token)
+    {
+        if (string.IsNullOrEmpty(target.NodeId) || string.IsNullOrEmpty(target.Prop))
+        {
+            return false;
+        }
+
+        var node = Session.Document.Find(target.NodeId);
+        var field = node is null
+            ? null
+            : Registry.Find(node.Type)?.Fields.FirstOrDefault(candidate =>
+                candidate.AcceptsTokens && string.Equals(candidate.Name, target.Prop, StringComparison.Ordinal));
+        if (node is null || field is null)
+        {
+            return false;
+        }
+
+        // A rich-text caret is a position in the visible text, not in the stored HTML.
+        if (string.Equals(target.Kind, "canvas", StringComparison.Ordinal) && field.Editor == FieldEditors.RichText)
+        {
+            return false;
+        }
+
+        string current = node.Get(field.Name) ?? field.DefaultValue;
+        string updated = TokenInsertion.Insert(current, target.Start, target.End, token, out int caret);
+        pendingCaretId = $"pk-{node.Id}-{field.Name}";
+        pendingCaret = caret;
+        await SetPropAsync(node.Id, field.Name, updated);
+        return true;
+    }
+
+    private sealed class TokenCaret
+    {
+        public string Kind { get; set; } = string.Empty;
+
+        public string NodeId { get; set; } = string.Empty;
+
+        public string Prop { get; set; } = string.Empty;
+
+        public int Start { get; set; }
+
+        public int End { get; set; }
     }
 
     private bool IsAllowed(BlockDefinition definition) => AllowedBlocks is null || AllowedBlocks.Contains(definition.Type);

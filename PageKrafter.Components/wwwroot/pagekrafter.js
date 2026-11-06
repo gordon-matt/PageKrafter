@@ -5,7 +5,7 @@
 const editors = new Map();
 
 export function mount(host, frame, dotnet) {
-    const state = { host, frame, dotnet, ready: false, queue: [] };
+    const state = { host, frame, dotnet, ready: false, queue: [], captured: null };
 
     state.onMessage = (event) => {
         if (event.source !== frame.contentWindow || !event.data || event.data.__pk !== true) {
@@ -54,10 +54,22 @@ export function mount(host, frame, dotnet) {
         }
     };
 
+    // Capture phase, so the caret is saved before the button takes focus.
+    state.onTokenPointerDown = (event) => {
+        const target = event.target instanceof Element ? event.target.closest('[data-pk-token-action]') : null;
+        if (!target || !host.contains(target)) {
+            return;
+        }
+
+        event.preventDefault();
+        captureTokenTarget(frame);
+    };
+
     window.addEventListener('message', state.onMessage);
     host.addEventListener('dragstart', state.onDragStart);
     host.addEventListener('dragend', state.onDragEnd);
     host.addEventListener('keydown', state.onKeyDown);
+    host.addEventListener('mousedown', state.onTokenPointerDown, true);
     editors.set(frame, state);
 }
 
@@ -98,6 +110,66 @@ export function confirmAction(message) {
     return window.confirm(message);
 }
 
+// Remember the caret before a toolbar click moves focus. A later click keeps the previous
+// capture when the click itself is not inside a token field.
+export function captureTokenTarget(frame) {
+    const state = editors.get(frame);
+    if (!state) {
+        return;
+    }
+
+    const active = document.activeElement;
+    if (active && state.host.contains(active) && active.hasAttribute('data-pk-token-field')
+        && typeof active.selectionStart === 'number') {
+        state.captured = {
+            kind: 'field',
+            nodeId: active.getAttribute('data-pk-node'),
+            prop: active.getAttribute('data-pk-prop'),
+            start: active.selectionStart,
+            end: active.selectionEnd ?? active.selectionStart,
+        };
+        return;
+    }
+
+    const win = frame.contentWindow;
+    const caret = win && typeof win.pkCaptureTokenCaret === 'function' ? win.pkCaptureTokenCaret() : null;
+    if (caret) {
+        state.captured = caret;
+    }
+}
+
+export function peekTokenTarget(frame) {
+    return editors.get(frame)?.captured ?? null;
+}
+
+export function insertCanvasToken(frame, text) {
+    const win = frame.contentWindow;
+    return !!win && typeof win.pkInsertTokenText === 'function' && win.pkInsertTokenText(text) === true;
+}
+
+export function releaseTokenCaret(frame) {
+    const state = editors.get(frame);
+    if (state) {
+        state.captured = null;
+    }
+
+    const win = frame.contentWindow;
+    if (win && typeof win.pkReleaseTokenCaret === 'function') {
+        win.pkReleaseTokenCaret();
+    }
+}
+
+export function restoreCaret(id, caret) {
+    const element = document.getElementById(id);
+    if (!element || typeof element.setSelectionRange !== 'function') {
+        return;
+    }
+
+    element.focus();
+    const position = Math.max(0, Math.min(caret, element.value.length));
+    element.setSelectionRange(position, position);
+}
+
 export async function copyText(text) {
     try {
         await navigator.clipboard.writeText(text);
@@ -121,6 +193,7 @@ export function dispose(frame) {
     state.host.removeEventListener('dragstart', state.onDragStart);
     state.host.removeEventListener('dragend', state.onDragEnd);
     state.host.removeEventListener('keydown', state.onKeyDown);
+    state.host.removeEventListener('mousedown', state.onTokenPointerDown, true);
     editors.delete(frame);
 }
 

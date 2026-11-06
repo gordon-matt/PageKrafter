@@ -191,10 +191,27 @@ public sealed class BlockRenderContext
     /// <param name="name">The name.</param>
     /// <param name="rich">The rich.</param>
     /// <returns>The editable attribute map.</returns>
-    public IReadOnlyDictionary<string, object> EditableAttributeMap(string name, bool rich = false) =>
-        IsEditor
-            ? new Dictionary<string, object>(StringComparer.Ordinal) { ["data-pk-edit"] = name, ["data-pk-edit-kind"] = rich ? "rich" : "plain" }
-            : EmptyMap;
+    public IReadOnlyDictionary<string, object> EditableAttributeMap(string name, bool rich = false)
+    {
+        if (!IsEditor)
+        {
+            return EmptyMap;
+        }
+
+        var map = new Dictionary<string, object>(StringComparer.Ordinal)
+        {
+            ["data-pk-edit"] = name,
+            ["data-pk-edit-kind"] = rich ? "rich" : "plain",
+        };
+
+        // The canvas uses this to allow token insertion only in fields that opted in.
+        if (Definition.Fields.Any(field => field.AcceptsTokens && string.Equals(field.Name, name, StringComparison.Ordinal)))
+        {
+            map["data-pk-token"] = string.Empty;
+        }
+
+        return map;
+    }
 
     private static readonly IReadOnlyDictionary<string, object> EmptyMap = new Dictionary<string, object>();
 

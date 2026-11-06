@@ -1,4 +1,5 @@
 using Heroicsoft.NetForge.Components.Toasts;
+using PageKrafter.Editing;
 using PageKrafter.Demo.Storage;
 
 namespace PageKrafter.Demo.Components.Pages;
@@ -26,6 +27,10 @@ public partial class BuilderPage
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Placeholders offered in email mode. The demo supplies a sample list; a host supplies its own.</summary>
+    [Parameter]
+    public IReadOnlyList<EditorToken>? Tokens { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

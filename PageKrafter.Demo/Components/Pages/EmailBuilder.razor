@@ -2,6 +2,15 @@
 
 <PageTitle>Email builder · PageKrafter</PageTitle>
 
-<BuilderPage Name="newsletter" Mode="DocumentMode.Email" Title="Email builder">
+<BuilderPage Name="newsletter" Mode="DocumentMode.Email" Title="Email builder" Tokens="tokens">
     The same blocks render as tables with inline styles, so the result works in email clients. Web-only blocks are left out of the palette.
 </BuilderPage>
+
+@code {
+    private static readonly EditorToken[] tokens =
+    [
+        new("{{FIRST_NAME}}", "Given name"),
+        new("{{LAST_NAME}}", "Family name"),
+        new("{{DATE_OF_BIRTH}}", "Date of birth"),
+    ];
+}

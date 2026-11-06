@@ -16,6 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="PageKrafter.Components" />
 		<InternalsVisibleTo Include="PageKrafter.Tests" />
 	</ItemGroup>
 

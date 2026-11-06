@@ -46,20 +46,20 @@
 
             case FieldEditors.TextArea:
                 <label class="pk-label" for="@InputId">@Field.Label</label>
-                <textarea id="@InputId" class="pk-input" rows="4" placeholder="@Field.Placeholder" @oninput="OnInputAsync">@Current</textarea>
+                <textarea id="@InputId" class="pk-input" rows="4" placeholder="@Field.Placeholder" @attributes="TokenAttributes" @oninput="OnInputAsync">@Current</textarea>
                 break;
 
             case FieldEditors.RichText:
             case FieldEditors.Html:
                 <label class="pk-label" for="@InputId">@Field.Label</label>
-                <textarea id="@InputId" class="pk-input pk-code" rows="@(Field.Editor == FieldEditors.Html ? 10 : 6)" spellcheck="false" placeholder="@Field.Placeholder" @oninput="OnInputAsync">@Current</textarea>
+                <textarea id="@InputId" class="pk-input pk-code" rows="@(Field.Editor == FieldEditors.Html ? 10 : 6)" spellcheck="false" placeholder="@Field.Placeholder" @attributes="TokenAttributes" @oninput="OnInputAsync">@Current</textarea>
                 break;
 
             case FieldEditors.Image:
             default:
                 <label class="pk-label" for="@InputId">@Field.Label</label>
                 <div class="pk-file">
-                    <input id="@InputId" class="pk-input" type="@(Field.Editor == FieldEditors.Url ? "url" : "text")" value="@Current" placeholder="@Field.Placeholder" @oninput="OnInputAsync" />
+                    <input id="@InputId" class="pk-input" type="@(Field.Editor == FieldEditors.Url ? "url" : "text")" value="@Current" placeholder="@Field.Placeholder" @attributes="TokenAttributes" @oninput="OnInputAsync" />
                     @if (CanBrowse)
                     {
                         <button type="button" class="pk-mini-btn" title="Browse files" aria-label="Browse files for @Field.Label" @onclick="BrowseAsync">@Icons.Folder</button>

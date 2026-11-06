@@ -79,6 +79,12 @@ public sealed record BlockField
     public FilePickerKind? FilePicker { get; init; }
 
     /// <summary>
+    /// When true, an email editor may insert host-supplied tokens into this field at the caret.
+    /// The token text is inserted as-is. PageKrafter does not know how the host replaces it.
+    /// </summary>
+    public bool AcceptsTokens { get; init; }
+
+    /// <summary>
     /// Gets the text.
     /// </summary>
     /// <param name="name">The name.</param>

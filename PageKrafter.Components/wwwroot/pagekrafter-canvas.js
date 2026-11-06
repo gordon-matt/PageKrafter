@@ -17,6 +17,8 @@
     let dropTarget = null;
     let editing = null;
     let pendingRender = null;
+    let retainEditing = false;
+    let savedRange = null;
     let preview = false;
     let frameRequested = false;
 
@@ -345,11 +347,116 @@
 
     function onEditBlur() {
         setTimeout(() => {
-            if (editing && !rte.contains(document.activeElement)) {
-                stopEditing();
+            if (!editing) {
+                return;
             }
+
+            if (rte.contains(document.activeElement) || editing.el.contains(document.activeElement)) {
+                return;
+            }
+
+            // Focus moved to the host page, usually the token menu. Keep the caret until that menu inserts or closes.
+            if (retainEditing && !document.hasFocus()) {
+                return;
+            }
+
+            stopEditing();
         }, 0);
     }
+
+    function offsetWithin(element, container, offset) {
+        try {
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            range.setEnd(container, offset);
+            return range.toString().length;
+        } catch {
+            return element.innerText.length;
+        }
+    }
+
+    function caretOffsets(element) {
+        const selection = window.getSelection();
+        const length = element.innerText.length;
+        if (!selection || selection.rangeCount === 0 || !element.contains(selection.anchorNode)) {
+            return { start: length, end: length };
+        }
+
+        const range = selection.getRangeAt(0);
+        return {
+            start: offsetWithin(element, range.startContainer, range.startOffset),
+            end: offsetWithin(element, range.endContainer, range.endOffset),
+        };
+    }
+
+    function insertTextAtSelection(text) {
+        if (document.execCommand('insertText', false, text)) {
+            return true;
+        }
+
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) {
+            return false;
+        }
+
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        const node = document.createTextNode(text);
+        range.insertNode(node);
+        range.setStartAfter(node);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        return true;
+    }
+
+    window.pkCaptureTokenCaret = () => {
+        if (!editing || !editing.el.hasAttribute('data-pk-token')) {
+            return null;
+        }
+
+        retainEditing = true;
+        const selection = window.getSelection();
+        savedRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
+        const offsets = caretOffsets(editing.el);
+        return {
+            kind: 'canvas',
+            nodeId: editing.id,
+            prop: editing.prop,
+            start: offsets.start,
+            end: offsets.end,
+        };
+    };
+
+    window.pkInsertTokenText = (text) => {
+        if (!editing || !editing.el.hasAttribute('data-pk-token')) {
+            return false;
+        }
+
+        editing.el.focus({ preventScroll: true });
+        const selection = window.getSelection();
+        if (savedRange && selection) {
+            selection.removeAllRanges();
+            selection.addRange(savedRange);
+        }
+
+        savedRange = null;
+        retainEditing = false;
+        if (!insertTextAtSelection(text)) {
+            return false;
+        }
+
+        commitEdit(editing);
+        return true;
+    };
+
+    window.pkReleaseTokenCaret = () => {
+        retainEditing = false;
+        savedRange = null;
+        if (editing && !document.hasFocus()) {
+            stopEditing();
+        }
+    };
 
     function onPaste(event) {
         event.preventDefault();

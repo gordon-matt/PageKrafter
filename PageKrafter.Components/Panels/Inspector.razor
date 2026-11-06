@@ -27,7 +27,27 @@
                 <button type="button" class="pk-icon-btn" title="Move down (Ctrl+↓)" aria-label="Move down" @onclick='() => Editor.RunCommandAsync("down", Node.Id)'>@Icons.Down</button>
                 <button type="button" class="pk-icon-btn" title="Duplicate (Ctrl+D)" aria-label="Duplicate" @onclick='() => Editor.RunCommandAsync("duplicate", Node.Id)'>@Icons.Copy</button>
                 <button type="button" class="pk-icon-btn" title="Save as template" aria-label="Save as template" @onclick='() => Editor.RunCommandAsync("save-template", Node.Id)'>@Icons.Star</button>
+                @if (ShowTokenButton)
+                {
+                    <button type="button" class="pk-icon-btn@(tokensOpen ? " is-active" : null)" title="Insert token" aria-label="Insert token" aria-haspopup="menu" aria-expanded="@(tokensOpen ? "true" : "false")" aria-pressed="@(tokensOpen ? "true" : "false")" data-pk-token-action @onclick="ToggleTokens">@Icons.Tokens</button>
+                }
                 <button type="button" class="pk-icon-btn pk-danger" title="Delete (Del)" aria-label="Delete" @onclick='() => Editor.RunCommandAsync("delete", Node.Id)'>@Icons.Trash</button>
+                @if (ShowTokenButton && tokensOpen)
+                {
+                    <div class="pk-token-panel" role="menu" aria-label="Tokens">
+                        <p class="pk-token-hint">Insert at the cursor</p>
+                        @foreach (var token in Editor.TokenChoices)
+                        {
+                            <button type="button" class="pk-token-option" role="menuitem" data-pk-token-action @onclick="() => InsertTokenAsync(token)">
+                                <code>@token.Value</code>
+                                @if (!string.IsNullOrWhiteSpace(token.Description))
+                                {
+                                    <small>@token.Description</small>
+                                }
+                            </button>
+                        }
+                    </div>
+                }
             </div>
         }
 

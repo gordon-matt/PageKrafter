@@ -44,6 +44,15 @@ public partial class FieldInput
 
     private string InputId => $"pk-{Node.Id}-{Field.Name}";
 
+    private IReadOnlyDictionary<string, object>? TokenAttributes => Field.AcceptsTokens
+        ? new Dictionary<string, object>
+        {
+            ["data-pk-token-field"] = string.Empty,
+            ["data-pk-node"] = Node.Id,
+            ["data-pk-prop"] = Field.Name,
+        }
+        : null;
+
     private string? Error => optionsError ?? pickError;
 
     private FilePickerKind? PickKind => Field.FilePicker ?? (Field.Editor == FieldEditors.Image ? FilePickerKind.Image : null);

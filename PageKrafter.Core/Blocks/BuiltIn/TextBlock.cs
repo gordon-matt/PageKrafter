@@ -26,6 +26,7 @@ public sealed class TextBlock : BlockDefinition
         BlockField.RichText("content", "Text", "<p>Start writing here. Double-click this text on the page to edit it in place.</p>") with
         {
             HelpText = "Double-click the text on the page to edit it with formatting.",
+            AcceptsTokens = true,
         },
     ];
 
