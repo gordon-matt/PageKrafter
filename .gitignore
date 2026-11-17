@@ -410,3 +410,6 @@ Pickstack.Demo/wwwroot/media/
 Pickstack.Demo/wwwroot/media-thumbs/
 # Demo runtime data (saved pages and templates)
 PageKrafter.Demo/App_Data/
+# Folders Pickstack creates when the demo starts
+PageKrafter.Demo/wwwroot/media/
+PageKrafter.Demo/wwwroot/media-thumbs/

@@ -1,10 +1,17 @@
 using Microsoft.AspNetCore.Components.Rendering;
 using PageKrafter.Components;
+using Pickstack.RichTextEditor;
 
 namespace PageKrafter.Tests;
 
 public class ExtensibilityTests
 {
+    [Fact]
+    public void A_rich_text_editor_is_optional()
+    {
+        Assert.Null(TestHost.Create().GetService<IRichTextEditor>());
+    }
+
     [Fact]
     public void Host_blocks_replace_built_ins_whatever_the_registration_order()
     {

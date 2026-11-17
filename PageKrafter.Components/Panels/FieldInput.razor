@@ -51,7 +51,13 @@
 
             case FieldEditors.RichText:
             case FieldEditors.Html:
-                <label class="pk-label" for="@InputId">@Field.Label</label>
+                <div class="pk-field-label">
+                    <label class="pk-label" for="@InputId">@Field.Label</label>
+                    @if (CanOpenRichText)
+                    {
+                        <button type="button" class="pk-icon-btn" title="Edit with the rich text editor" aria-label="Edit @Field.Label with the rich text editor" aria-haspopup="dialog" @onclick="OpenRichText">@Icons.RichText</button>
+                    }
+                </div>
                 <textarea id="@InputId" class="pk-input pk-code" rows="@(Field.Editor == FieldEditors.Html ? 10 : 6)" spellcheck="false" placeholder="@Field.Placeholder" @attributes="TokenAttributes" @oninput="OnInputAsync">@Current</textarea>
                 break;
 

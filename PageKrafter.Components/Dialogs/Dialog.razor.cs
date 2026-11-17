@@ -19,6 +19,10 @@ public partial class Dialog
     [Parameter]
     public string Title { get; set; } = string.Empty;
 
+    /// <summary>Gives the dialog most of the editor, for a rich text editor that does not fit the inspector.</summary>
+    [Parameter]
+    public bool Wide { get; set; }
+
     /// <summary>
     /// Gets or sets the child content.
     /// </summary>

@@ -3,6 +3,7 @@ using Heroicsoft.NetForge.Components.Toasts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PageKrafter.Components.Dialogs;
+using Pickstack.RichTextEditor;
 
 namespace PageKrafter.Components;
 
@@ -32,6 +33,7 @@ public partial class PageKrafterEditor
     private bool saving;
     private SaveTemplateDialog saveDialog = default!;
     private CodeDialog codeDialog = default!;
+    private RichTextDialog? richTextDialog;
     private string? pendingCaretId;
     private int pendingCaret;
 
@@ -114,6 +116,9 @@ public partial class PageKrafterEditor
     [Inject]
     private ToastService Toasts { get; set; } = default!;
 
+    [Inject]
+    private IServiceProvider Services { get; set; } = default!;
+
     /// <summary>
     /// Gets the document.
     /// </summary>
@@ -126,6 +131,9 @@ public partial class PageKrafterEditor
     internal IReadOnlyList<PageTemplate> Templates { get; private set; } = [];
 
     internal PageKrafterOptions Settings => Options.Value;
+
+    /// <summary>True when the host registered a Pickstack rich text editor. Text fields then open it in a dialog.</summary>
+    internal bool HasRichTextEditor { get; private set; }
 
     internal IReadOnlyList<EditorToken> TokenChoices =>
         Tokens is null
@@ -307,6 +315,9 @@ public partial class PageKrafterEditor
         StateHasChanged();
     }
 
+    internal void OpenRichText(string nodeId, string prop, string label) =>
+        richTextDialog?.Open(nodeId, prop, label);
+
     internal async Task CopyAsync(string text)
     {
         if (module is not null)
@@ -315,6 +326,10 @@ public partial class PageKrafterEditor
             Toasts.Success("Copied to the clipboard.");
         }
     }
+
+    /// <inheritdoc/>
+    protected override void OnInitialized() =>
+        HasRichTextEditor = Services.GetService<IRichTextEditor>() is not null;
 
     /// <inheritdoc/>
     protected override async Task OnParametersSetAsync()

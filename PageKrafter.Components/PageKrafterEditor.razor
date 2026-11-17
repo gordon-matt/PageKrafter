@@ -66,4 +66,10 @@
 
     <SaveTemplateDialog @ref="saveDialog" Editor="this" />
     <CodeDialog @ref="codeDialog" Editor="this" />
+    @if (HasRichTextEditor)
+    {
+        @* Loads the editor the host registered with Pickstack. The dialog opens from the Text field. *@
+        <PickstackScripts />
+        <RichTextDialog @ref="richTextDialog" Editor="this" />
+    }
 </div>

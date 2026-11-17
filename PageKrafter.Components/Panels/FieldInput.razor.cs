@@ -59,6 +59,8 @@ public partial class FieldInput
 
     private bool CanBrowse => picker is not null && PickKind is not null;
 
+    private bool CanOpenRichText => Field.Editor == FieldEditors.RichText && Editor.HasRichTextEditor;
+
     private string Current => Node.Get(Field.Name) ?? Field.DefaultValue;
 
     private Type? CustomEditor => Editor.Settings.FieldEditorComponents.TryGetValue(Field.Editor, out var type) ? type : null;
@@ -120,6 +122,8 @@ public partial class FieldInput
     }
 
     private Task SetAsync(string value) => Editor.SetPropAsync(Node.Id, Field.Name, value);
+
+    private void OpenRichText() => Editor.OpenRichText(Node.Id, Field.Name, Field.Label);
 
     private async Task BrowseAsync()
     {

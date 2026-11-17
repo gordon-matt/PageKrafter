@@ -15,4 +15,9 @@
 		<None Remove="App_Data\**" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="Pickstack.FileManager.WebFilez" Version="1.0.6" />
+	  <PackageReference Include="Pickstack.RichTextEditor.TinyMce8" Version="1.0.6" />
+	</ItemGroup>
+
 </Project>

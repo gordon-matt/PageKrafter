@@ -1,0 +1,13 @@
+<Dialog Open="open" Title="@title" Wide="true" OnClose="Close">
+    <ChildContent>
+        @if (open && nodeId is not null && prop is not null)
+        {
+            <div class="pk-rich-editor">
+                <PickstackEditor @key="generation" Value="@Current" ValueChanged="ChangedAsync" Height="480" />
+            </div>
+        }
+    </ChildContent>
+    <Footer>
+        <button type="button" class="pk-btn pk-btn-primary" @onclick="Close">Done</button>
+    </Footer>
+</Dialog>

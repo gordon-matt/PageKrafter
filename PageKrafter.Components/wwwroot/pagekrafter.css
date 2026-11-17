@@ -685,6 +685,19 @@ textarea.pk-input {
     gap: 4px;
 }
 
+.pk-field-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.pk-field-label .pk-icon-btn {
+    flex: none;
+    width: 28px;
+    height: 28px;
+}
+
 .pk-label {
     font-size: 12px;
     font-weight: 600;
@@ -776,6 +789,25 @@ textarea.pk-input {
     border-radius: 10px;
     background: var(--pk-panel);
     box-shadow: 0 20px 50px rgba(15, 23, 42, .3);
+}
+
+.pk-dialog.is-wide {
+    width: min(1040px, 100%);
+    max-height: min(720px, 100%);
+}
+
+.pk-dialog.is-wide .pk-dialog-body {
+    flex: 1;
+    min-height: 0;
+}
+
+.pk-rich-editor,
+.pk-rich-editor .tox-tinymce {
+    max-width: 100%;
+}
+
+.pk-rich-editor textarea.pickstack-editor {
+    min-height: 320px;
 }
 
 .pk-dialog-head {

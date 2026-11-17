@@ -68,7 +68,7 @@ To show a page, either store the HTML from `PageRenderer.RenderAsync` when savin
 
 - Drag blocks, section templates and layers. Drop near a container's edge to place a block beside it rather than inside.
 - Click a palette item to add it next to the selected block.
-- Double-click headings, text and buttons to edit them on the page. Text blocks get a small formatting toolbar.
+- Double-click headings, text and buttons to edit them on the page. Text blocks get a small formatting toolbar. When the site registers a Pickstack rich text editor, the Text field also has a button that opens that editor in a dialog.
 - Inspector with grouped content, style and advanced fields. Every block gets padding, margin, colours, alignment, radius, CSS classes, an anchor id and responsive visibility.
 - Layers tree, undo and redo (edits to the same field are merged), desktop, tablet and mobile widths, preview mode and an HTML export dialog.
 - Keyboard shortcuts:
@@ -213,6 +213,28 @@ Derive from `JsFilePicker` and override `CreateArgument` if the function needs m
 Section backgrounds and images use `Image`, and the video block uses `Video`. Add a Browse button to any other field with `BlockField.Url("file", "Download") with { FilePicker = FilePickerKind.Any }`.
 
 Pages can store root-relative paths such as `/media/photo.jpg`. For email documents, make the picker return absolute URLs, because mail clients can't resolve relative ones. The demo's `demo-files.js` is a small working example.
+
+### Rich text
+
+Text is stored as HTML. The inspector shows that HTML, and double-clicking the text on the page edits it in place. The inspector is too narrow for a full editor, so PageKrafter does not embed one there.
+
+If you register a rich text editor with Pickstack, the same way BlogKrafter does, a button beside the Text label opens it in a dialog. PageKrafter only asks whether an editor was registered. It does not choose TinyMCE or any other product. Without one, the button is hidden and the HTML box remains.
+
+```csharp
+builder.Services.AddControllersWithViews();
+builder.Services.AddPickstack(builder.Configuration)
+    .AddWebFilez(files => files.UseHostBlazor())
+    .Pickstack
+    .AddTinyMce8(editor => editor.WithHeight(480));
+
+app.UseStaticFiles();
+app.UsePickstack();
+app.MapControllers();
+```
+
+That needs the `Pickstack.RichTextEditor.TinyMce8` package (or another Pickstack editor). `Pickstack` itself is already referenced by `PageKrafter.Components`. Any field created with `BlockField.RichText` gets the button, not only the built-in Text block. The dialog writes HTML back as you type, and rendering still runs it through the sanitizer.
+
+Image and media buttons in that editor open the file manager registered with Pickstack. WebFilez is an MVC page in a frame, so the site also needs `AddControllersWithViews()`, `MapControllers()`, and `<RequiresAspNetWebAssets>true</RequiresAspNetWebAssets>`. `UseStaticFiles()` serves files it saves under `wwwroot`. `UseHostBlazor()` leaves the site's existing circuit in place. Without the MVC endpoints, the frame loads the Blazor app instead of the file browser.
 
 ## Regions filled by the host
 
