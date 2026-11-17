@@ -236,6 +236,13 @@ That needs the `Pickstack.RichTextEditor.TinyMce8` package (or another Pickstack
 
 Image and media buttons in that editor open the file manager registered with Pickstack. WebFilez is an MVC page in a frame, so the site also needs `AddControllersWithViews()`, `MapControllers()`, and `<RequiresAspNetWebAssets>true</RequiresAspNetWebAssets>`. `UseStaticFiles()` serves files it saves under `wwwroot`. `UseHostBlazor()` leaves the site's existing circuit in place. Without the MVC endpoints, the frame loads the Blazor app instead of the file browser.
 
+To keep each tenant in its own folder, register an `IFileRootProvider` before `AddPageKrafter`. The rich text editor and a host file picker that asks it both open there, and the editor cannot browse above that folder. Null, the default, opens the whole upload directory.
+
+```csharp
+services.AddScoped<IFileRootProvider, TenantFileRootProvider>();
+services.AddPageKrafter();
+```
+
 ## Regions filled by the host
 
 Some parts of a page don't belong to the page itself. A news list, a search box or a sidebar of links come from the host application and change without the page being edited. The demo's `ContentZoneBlock` shows one way to leave room for them.

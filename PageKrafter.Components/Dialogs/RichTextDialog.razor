@@ -3,7 +3,7 @@
         @if (open && nodeId is not null && prop is not null)
         {
             <div class="pk-rich-editor">
-                <PickstackEditor @key="generation" Value="@Current" ValueChanged="ChangedAsync" Height="480" />
+                <PickstackEditor @key="@($"{generation}:{FileRoot}")" Value="@Current" ValueChanged="ChangedAsync" Height="480" FileRoot="@FileRoot" />
             </div>
         }
     </ChildContent>

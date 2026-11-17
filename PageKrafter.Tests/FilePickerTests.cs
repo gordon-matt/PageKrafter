@@ -33,6 +33,25 @@ public class FilePickerTests
     }
 
     [Fact]
+    public void The_default_file_root_opens_the_whole_library()
+    {
+        Assert.Null(TestHost.Create().GetRequiredService<IFileRootProvider>().GetFileRoot());
+    }
+
+    [Fact]
+    public void A_file_root_registered_before_pagekrafter_is_kept()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddScoped<IFileRootProvider, TenantFileRootProvider>();
+        services.AddPageKrafter();
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        Assert.Equal("Tenant_3", scope.ServiceProvider.GetRequiredService<IFileRootProvider>().GetFileRoot());
+    }
+
+    [Fact]
     public void Pickers_are_registered_for_the_editor_and_a_later_registration_wins()
     {
         var services = new ServiceCollection();
@@ -64,6 +83,11 @@ public class FilePickerTests
         Assert.Equal(FieldEditors.Image, registry.Find(BlockTypes.Image)!.Fields.Single(field => field.Name == "src").Editor);
         Assert.Equal(FieldEditors.Image, registry.Find(BlockTypes.Section)!.Fields.Single(field => field.Name == "backgroundImage").Editor);
         Assert.Equal(FilePickerKind.Video, registry.Find(BlockTypes.Video)!.Fields.Single(field => field.Name == "url").FilePicker);
+    }
+
+    private sealed class TenantFileRootProvider : IFileRootProvider
+    {
+        public string? GetFileRoot() => "Tenant_3";
     }
 
     private sealed class StubPicker : IFilePicker

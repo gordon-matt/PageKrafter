@@ -18,6 +18,11 @@ public partial class RichTextDialog
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 
+    [Inject]
+    private IFileRootProvider FileRoots { get; set; } = default!;
+
+    private string? FileRoot => FileRoots.GetFileRoot();
+
     /// <inheritdoc/>
     protected override void OnParametersSet()
     {

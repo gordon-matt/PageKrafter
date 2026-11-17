@@ -42,6 +42,7 @@ public static class ServiceCollectionExtensions
             services.TryAddScoped<BlockRegistry>();
             services.TryAddScoped<PageRenderer>();
             services.TryAddScoped<ITemplateService, TemplateService>();
+            services.TryAddScoped<IFileRootProvider, DefaultFileRootProvider>();
             return services;
         }
 
