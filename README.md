@@ -232,6 +232,13 @@ app.UsePickstack();
 app.MapControllers();
 ```
 
+```razor
+<PickstackScripts />
+<PageKrafterEditor @bind-Value="page.Json" OnSave="SaveAsync" />
+```
+
+Put `PickstackScripts` on the page once. The editor does not load those scripts itself. A second copy starts while the first is still downloading, which is what happens once the browser has them cached, and the file manager script gives up before Pickstack exists. The page then says that no file manager is registered until the cache is cleared. BlogKrafter avoids this by loading the scripts in one place.
+
 That needs the `Pickstack.RichTextEditor.TinyMce8` package (or another Pickstack editor). `Pickstack` itself is already referenced by `PageKrafter.Components`. Any field created with `BlockField.RichText` gets the button, not only the built-in Text block. The dialog writes HTML back as you type, and rendering still runs it through the sanitizer.
 
 Image and media buttons in that editor open the file manager registered with Pickstack. WebFilez is an MVC page in a frame, so the site also needs `AddControllersWithViews()`, `MapControllers()`, and `<RequiresAspNetWebAssets>true</RequiresAspNetWebAssets>`. `UseStaticFiles()` serves files it saves under `wwwroot`. `UseHostBlazor()` leaves the site's existing circuit in place. Without the MVC endpoints, the frame loads the Blazor app instead of the file browser.
