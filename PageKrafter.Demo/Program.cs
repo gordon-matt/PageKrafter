@@ -33,6 +33,7 @@ var app = builder.Build();
 app.UseStaticFiles();
 app.UseAntiforgery();
 app.MapStaticAssets();
+app.MapNetForgeAssets();
 app.UsePickstack();
 app.MapControllers();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
