@@ -3,16 +3,12 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace PageKrafter.Components.Panels;
 
-/// <summary>
-/// Represents the block palette.
-/// </summary>
+/// <summary>The blocks that can be added to the current document. Clicking one inserts it near the selection, and dragging one drops it on the canvas.</summary>
 public partial class BlockPalette
 {
     private string search = string.Empty;
 
-    /// <summary>
-    /// Gets or sets the editor.
-    /// </summary>
+    /// <summary>The editor that receives the inserted block.</summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

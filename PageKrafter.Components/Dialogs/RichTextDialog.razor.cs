@@ -12,9 +12,7 @@ public partial class RichTextDialog
     private string title = "Edit text";
     private int generation;
 
-    /// <summary>
-    /// Gets or sets the editor.
-    /// </summary>
+    /// <summary>The editor whose field is being changed. The HTML is written back as it changes, and rendering still sanitizes it.</summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

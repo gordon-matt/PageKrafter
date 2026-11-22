@@ -1,8 +1,6 @@
 namespace PageKrafter.Blocks.BuiltIn;
 
-/// <summary>
-/// Represents the spacer block.
-/// </summary>
+/// <summary>Empty vertical space, for web pages and emails.</summary>
 public sealed class SpacerBlock : BlockDefinition
 {
     /// <inheritdoc/>

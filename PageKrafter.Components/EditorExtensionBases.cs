@@ -6,48 +6,34 @@ namespace PageKrafter.Components;
 /// </summary>
 public abstract class FieldEditorBase : ComponentBase
 {
-    /// <summary>
-    /// Gets or sets the field.
-    /// </summary>
+    /// <summary>The field this editor is drawing.</summary>
     [Parameter]
     public BlockField Field { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the node.
-    /// </summary>
+    /// <summary>The block that owns the field.</summary>
     [Parameter]
     public BlockNode Node { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the value.
-    /// </summary>
+    /// <summary>The current prop text, or the field default when the prop has never been set.</summary>
     [Parameter]
     public string Value { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Gets or sets the value changed.
-    /// </summary>
+    /// <summary>Raised with the new prop text. Call <see cref="SetValueAsync"/> rather than invoking this directly.</summary>
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
 
-    /// <summary>
-    /// Gets the input identifier.
-    /// </summary>
+    /// <summary>An id for the input and its label: <c>pk-</c>, the block id, and the field name.</summary>
     protected string InputId => $"pk-{Node.Id}-{Field.Name}";
 
-    /// <summary>
-    /// Sets the value.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <summary>Writes the prop and records the edit.</summary>
+    /// <param name="value">The text to store.</param>
+    /// <returns>A task that completes when the editor has accepted the value.</returns>
     protected Task SetValueAsync(string value) => ValueChanged.InvokeAsync(value);
 }
 
-/// <summary>
-/// Represents the property change.
-/// </summary>
-/// <param name="Name">The name.</param>
-/// <param name="Value">The value.</param>
+/// <summary>One prop written by a custom block inspector.</summary>
+/// <param name="Name">The prop name.</param>
+/// <param name="Value">The text to store.</param>
 public sealed record PropertyChange(string Name, string Value);
 
 /// <summary>
@@ -56,37 +42,27 @@ public sealed record PropertyChange(string Name, string Value);
 /// </summary>
 public abstract class BlockEditorBase : ComponentBase
 {
-    /// <summary>
-    /// Gets or sets the node.
-    /// </summary>
+    /// <summary>The block being edited.</summary>
     [Parameter]
     public BlockNode Node { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the definition.
-    /// </summary>
+    /// <summary>The block's definition, including its fields and defaults.</summary>
     [Parameter]
     public BlockDefinition Definition { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the callback raised for the change event.
-    /// </summary>
+    /// <summary>Raised with the prop that changed. Call <see cref="SetAsync"/> rather than invoking this directly.</summary>
     [Parameter]
     public EventCallback<PropertyChange> OnChange { get; set; }
 
-    /// <summary>
-    /// Gets the value.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <returns>The value.</returns>
+    /// <summary>The stored prop, the field default, or an empty string.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <returns>The text.</returns>
     protected string Value(string name) =>
         Node.Get(name) ?? Definition.Fields.FirstOrDefault(field => field.Name == name)?.DefaultValue ?? string.Empty;
 
-    /// <summary>
-    /// Sets the value.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <param name="value">The value.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <summary>Writes one prop and records the edit.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <param name="value">The text to store.</param>
+    /// <returns>A task that completes when the editor has accepted the value.</returns>
     protected Task SetAsync(string name, string value) => OnChange.InvokeAsync(new PropertyChange(name, value));
 }

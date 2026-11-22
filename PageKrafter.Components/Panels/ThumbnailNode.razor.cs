@@ -1,22 +1,16 @@
 namespace PageKrafter.Components.Panels;
 
-/// <summary>
-/// Represents the thumbnail node.
-/// </summary>
+/// <summary>One block in a template preview. The drawing stops after four levels and five children, and columns keep their width ratio.</summary>
 public partial class ThumbnailNode
 {
     private const int MaxDepth = 4;
     private const int MaxChildren = 5;
 
-    /// <summary>
-    /// Gets or sets the node.
-    /// </summary>
+    /// <summary>The block to draw.</summary>
     [Parameter, EditorRequired]
     public BlockNode Node { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the depth.
-    /// </summary>
+    /// <summary>How deep this block is. Drawing stops at four.</summary>
     [Parameter]
     public int Depth { get; set; }
 

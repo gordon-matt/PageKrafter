@@ -2,20 +2,14 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace PageKrafter.Components.Dialogs;
 
-/// <summary>
-/// Represents the dialog.
-/// </summary>
+/// <summary>A dialog over the editor. Escape and the close callback both dismiss it.</summary>
 public partial class Dialog
 {
-    /// <summary>
-    /// Gets or sets a value indicating whether this instance is open.
-    /// </summary>
+    /// <summary><see langword="true"/> shows the dialog.</summary>
     [Parameter]
     public bool Open { get; set; }
 
-    /// <summary>
-    /// Gets or sets the title.
-    /// </summary>
+    /// <summary>The heading.</summary>
     [Parameter]
     public string Title { get; set; } = string.Empty;
 
@@ -23,21 +17,15 @@ public partial class Dialog
     [Parameter]
     public bool Wide { get; set; }
 
-    /// <summary>
-    /// Gets or sets the child content.
-    /// </summary>
+    /// <summary>The dialog body.</summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    /// <summary>
-    /// Gets or sets the footer.
-    /// </summary>
+    /// <summary>Buttons under the body. <see langword="null"/> shows none.</summary>
     [Parameter]
     public RenderFragment? Footer { get; set; }
 
-    /// <summary>
-    /// Gets or sets the callback raised for the close event.
-    /// </summary>
+    /// <summary>Raised when the editor dismisses the dialog.</summary>
     [Parameter]
     public EventCallback OnClose { get; set; }
 

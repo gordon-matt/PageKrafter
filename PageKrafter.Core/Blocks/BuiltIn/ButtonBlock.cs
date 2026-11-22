@@ -1,8 +1,6 @@
 namespace PageKrafter.Blocks.BuiltIn;
 
-/// <summary>
-/// Represents the button block.
-/// </summary>
+/// <summary>A link drawn as a button, for web pages and emails.</summary>
 public sealed class ButtonBlock : BlockDefinition
 {
     /// <inheritdoc/>

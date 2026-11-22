@@ -2,71 +2,57 @@ using Microsoft.Extensions.Logging;
 
 namespace PageKrafter.Templates;
 
-/// <summary>
-/// Defines the contract for the template service.
-/// </summary>
+/// <summary>Lists, saves, and deletes templates. Provider templates are read-only. Saved templates go to the store.</summary>
 public interface ITemplateService
 {
     /// <summary>
-    /// Lists the value.
+    /// Templates for one document mode. Provider templates are marked read-only and listed after saved ones.
+    /// Within that, they are ordered by category and then name, ignoring case. The mode must match exactly.
     /// </summary>
-    /// <param name="mode">The mode.</param>
-    /// <param name="kind">The kind.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the page templates.</returns>
+    /// <param name="mode">The document mode.</param>
+    /// <param name="kind">When set, only this kind is returned.</param>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <returns>The matching templates.</returns>
     Task<Result<IReadOnlyList<PageTemplate>>> ListAsync(DocumentMode mode, TemplateKind? kind = null, CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Finds the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the page template.</returns>
+    /// <summary>The template from a provider or the store. A provider template is returned as read-only.</summary>
+    /// <param name="id">The template id.</param>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <returns>The template, or not found.</returns>
     Task<Result<PageTemplate>> FindAsync(string id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Saves the value.
+    /// Saves a template. The name is trimmed and must be present and no longer than <see cref="TemplateService.MaxNameLength"/>.
+    /// A page template must contain a page, and a section template must not. A blank category becomes <see cref="TemplateService.SavedCategory"/>.
+    /// A new id starts with <c>t</c>. Replacing a read-only template is forbidden. The stored content is a copy.
     /// </summary>
-    /// <param name="form">The form.</param>
-    /// <param name="content">The content.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the page template.</returns>
+    /// <param name="form">The name, kind, and mode.</param>
+    /// <param name="content">The page root, or the block to insert.</param>
+    /// <param name="cancellationToken">Cancels the save.</param>
+    /// <returns>The stored template, or invalid or forbidden.</returns>
     Task<Result<PageTemplate>> SaveAsync(TemplateForm form, BlockNode content, CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Deletes the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the result.</returns>
+    /// <summary>Deletes a saved template. A missing id is not found, and a provider template is forbidden.</summary>
+    /// <param name="id">The template id.</param>
+    /// <param name="cancellationToken">Cancels the delete.</param>
+    /// <returns>Success, not found, or forbidden.</returns>
     Task<Result> DeleteAsync(string id, CancellationToken cancellationToken = default);
 }
 
-/// <summary>
-/// Represents the template service.
-/// </summary>
+/// <inheritdoc cref="ITemplateService"/>
 public sealed class TemplateService(
     IEnumerable<ITemplateProvider> providers,
     ITemplateStore store,
     TimeProvider timeProvider,
     ILogger<TemplateService> logger) : ITemplateService
 {
-    /// <summary>
-    /// The saved category constant.
-    /// </summary>
+    /// <summary>The category used when an editor leaves the category blank. The value is "My templates".</summary>
     public const string SavedCategory = "My templates";
-    /// <summary>
-    /// The max name length constant.
-    /// </summary>
+
+    /// <summary>The longest template name, in characters. The value is 100.</summary>
     public const int MaxNameLength = 100;
 
-    /// <summary>
-    /// Lists the value.
-    /// </summary>
-    /// <param name="mode">The mode.</param>
-    /// <param name="kind">The kind.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the page templates.</returns>
+    /// <inheritdoc/>
     public async Task<Result<IReadOnlyList<PageTemplate>>> ListAsync(DocumentMode mode, TemplateKind? kind = null, CancellationToken cancellationToken = default)
     {
         var all = new List<PageTemplate>();
@@ -87,25 +73,14 @@ public sealed class TemplateService(
         return Result<IReadOnlyList<PageTemplate>>.Success(matching);
     }
 
-    /// <summary>
-    /// Finds the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the page template.</returns>
+    /// <inheritdoc/>
     public async Task<Result<PageTemplate>> FindAsync(string id, CancellationToken cancellationToken = default)
     {
         var template = await FindAnyAsync(id, cancellationToken);
         return template is null ? Result<PageTemplate>.NotFound() : Result<PageTemplate>.Success(template);
     }
 
-    /// <summary>
-    /// Saves the value.
-    /// </summary>
-    /// <param name="form">The form.</param>
-    /// <param name="content">The content.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is the outcome for the page template.</returns>
+    /// <inheritdoc/>
     public async Task<Result<PageTemplate>> SaveAsync(TemplateForm form, BlockNode content, CancellationToken cancellationToken = default)
     {
         string name = form.Name.Trim();
@@ -154,12 +129,7 @@ public sealed class TemplateService(
         return Result<PageTemplate>.Success(template);
     }
 
-    /// <summary>
-    /// Deletes the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the result.</returns>
+    /// <inheritdoc/>
     public async Task<Result> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
         var template = await FindAnyAsync(id, cancellationToken);

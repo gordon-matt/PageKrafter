@@ -1,8 +1,6 @@
 namespace PageKrafter.Blocks.BuiltIn;
 
-/// <summary>
-/// Represents the image block.
-/// </summary>
+/// <summary>An image with an optional link, for web pages and emails. The caption is web only. The image field browses for images when a file picker is registered.</summary>
 public sealed class ImageBlock : BlockDefinition
 {
     private const string Placeholder =

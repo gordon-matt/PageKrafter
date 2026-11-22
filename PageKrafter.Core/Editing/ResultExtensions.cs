@@ -1,23 +1,20 @@
 namespace PageKrafter.Editing;
 
-/// <summary>
-/// Provides extension methods for results.
-/// </summary>
+/// <summary>Reads the status and the first message from an editor result.</summary>
 public static class ResultExtensions
 {
-    /// <summary>
-    /// Gets the succeeded.
-    /// </summary>
+    /// <summary>Whether the status is OK, Created, or NoContent.</summary>
     /// <param name="result">The result.</param>
-    /// <returns>true when the condition is met; otherwise, false.</returns>
+    /// <returns><see langword="true"/> for those three statuses.</returns>
     public static bool Succeeded(this IResult result) =>
         result.Status is ResultStatus.Ok or ResultStatus.Created or ResultStatus.NoContent;
 
     /// <summary>
-    /// Gets the error message.
+    /// The first validation message, or the first error string. A not-found result says "That item no longer exists."
+    /// A forbidden result says "That can't be changed." Anything else says "Something went wrong."
     /// </summary>
     /// <param name="result">The result.</param>
-    /// <returns>The error message.</returns>
+    /// <returns>A message an editor can show.</returns>
     public static string ErrorMessage(this IResult result) => result.ValidationErrors?.FirstOrDefault() is { } validation
             ? validation.ErrorMessage
             : result.Errors?.FirstOrDefault() is { Length: > 0 } error

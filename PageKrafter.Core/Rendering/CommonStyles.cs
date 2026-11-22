@@ -6,46 +6,34 @@ namespace PageKrafter.Rendering;
 /// </summary>
 public static class CommonStyles
 {
-    /// <summary>
-    /// The padding constant.
-    /// </summary>
+    /// <summary>The padding prop. The value is <c>_padding</c>.</summary>
     public const string Padding = "_padding";
-    /// <summary>
-    /// The margin constant.
-    /// </summary>
+
+    /// <summary>The margin prop. The value is <c>_margin</c>.</summary>
     public const string Margin = "_margin";
-    /// <summary>
-    /// The background constant.
-    /// </summary>
+
+    /// <summary>The background color prop. The value is <c>_background</c>.</summary>
     public const string Background = "_background";
-    /// <summary>
-    /// The color constant.
-    /// </summary>
+
+    /// <summary>The text color prop. The value is <c>_color</c>.</summary>
     public const string Color = "_color";
-    /// <summary>
-    /// The align constant.
-    /// </summary>
+
+    /// <summary>The text alignment prop. The value is <c>_align</c>.</summary>
     public const string Align = "_align";
-    /// <summary>
-    /// The radius constant.
-    /// </summary>
+
+    /// <summary>The corner radius prop. The value is <c>_radius</c>.</summary>
     public const string Radius = "_radius";
-    /// <summary>
-    /// The CSS class constant.
-    /// </summary>
+
+    /// <summary>The extra CSS class prop. The value is <c>_class</c>.</summary>
     public const string CssClass = "_class";
-    /// <summary>
-    /// The anchor constant.
-    /// </summary>
+
+    /// <summary>The element id prop. The value is <c>_anchor</c>.</summary>
     public const string Anchor = "_anchor";
-    /// <summary>
-    /// The hide constant.
-    /// </summary>
+
+    /// <summary>The web-only visibility prop. The value is <c>_hide</c>. <c>mobile</c> adds <c>pk-hide-mobile</c>, and <c>desktop</c> adds <c>pk-hide-desktop</c>.</summary>
     public const string Hide = "_hide";
 
-    /// <summary>
-    /// Gets the fields.
-    /// </summary>
+    /// <summary>The shared inspector fields. Visibility is offered for web documents only.</summary>
     public static IReadOnlyList<BlockField> Fields { get; } =
     [
         BlockField.Text(Padding, "Padding", group: FieldGroups.Style) with { Placeholder = "e.g. 16px or 16px 24px" },

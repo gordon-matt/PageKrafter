@@ -1,8 +1,6 @@
 namespace PageKrafter.Rendering;
 
-/// <summary>
-/// Represents the block render context.
-/// </summary>
+/// <summary>What a block can use while it renders: the node, the document, and helpers that encode, sanitize, and render children.</summary>
 public sealed class BlockRenderContext
 {
     private readonly PageRenderer renderer;
@@ -30,110 +28,80 @@ public sealed class BlockRenderContext
         CancellationToken = cancellationToken;
     }
 
-    /// <summary>
-    /// Gets the node.
-    /// </summary>
+    /// <summary>The block being rendered.</summary>
     public BlockNode Node { get; }
 
-    /// <summary>
-    /// Gets the definition.
-    /// </summary>
+    /// <summary>The definition for <see cref="Node"/>.</summary>
     public BlockDefinition Definition { get; }
 
-    /// <summary>
-    /// Gets the document.
-    /// </summary>
+    /// <summary>The document that contains the block.</summary>
     public PageDocument Document { get; }
 
-    /// <summary>
-    /// Gets the options.
-    /// </summary>
+    /// <summary>Export or editor options for this render.</summary>
     public RenderOptions Options { get; }
 
-    /// <summary>
-    /// Gets the services.
-    /// </summary>
+    /// <summary>The current scope. A block can resolve a service the host registered.</summary>
     public IServiceProvider Services { get; }
 
-    /// <summary>
-    /// Gets the sanitizer.
-    /// </summary>
+    /// <summary>The sanitizer used by <see cref="RichText"/>.</summary>
     public IHtmlContentSanitizer Sanitizer { get; }
 
-    /// <summary>
-    /// Gets the cancellation token.
-    /// </summary>
+    /// <summary>Cancels this render. A block should pass it to work it awaits.</summary>
     public CancellationToken CancellationToken { get; }
 
-    /// <summary>
-    /// Gets the mode.
-    /// </summary>
+    /// <summary>The document mode.</summary>
     public DocumentMode Mode => Document.Mode;
 
-    /// <summary>
-    /// Gets a value indicating whether this instance is email.
-    /// </summary>
+    /// <summary><see langword="true"/> only when the document is an email.</summary>
     public bool IsEmail => Document.Mode == DocumentMode.Email;
 
     /// <summary>True when rendering for the editor canvas, where placeholders and selection markers are wanted.</summary>
     public bool IsEditor => Options.Purpose == RenderPurpose.Editor;
 
-    /// <summary>The stored prop, or the field default when the prop has never been set.</summary>
+    /// <summary>The stored prop, or the field default when the prop has never been set, or an empty string when the field has no default.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <returns>The text.</returns>
     public string Value(string name) =>
         Node.Get(name)
         ?? Definition.Fields.FirstOrDefault(field => string.Equals(field.Name, name, StringComparison.Ordinal))?.DefaultValue
         ?? string.Empty;
 
-    /// <summary>
-    /// Gets the text.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <returns>The text.</returns>
+    /// <summary><see cref="Value"/> encoded for element content or a double-quoted attribute.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <returns>The encoded text.</returns>
     public string Text(string name) => Html.Encode(Value(name));
 
-    /// <summary>
-    /// Gets the rich text.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <returns>The rich text.</returns>
+    /// <summary><see cref="Value"/> passed through <see cref="Sanitizer"/>.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <returns>The sanitized HTML.</returns>
     public string RichText(string name) => Sanitizer.Sanitize(Value(name));
 
-    /// <summary>
-    /// Gets the URL.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <param name="allowDataImage">The allow data image.</param>
-    /// <returns>The URL.</returns>
+    /// <summary><see cref="Value"/> kept only when <see cref="Html.SafeUrl"/> accepts it, then encoded.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <param name="allowDataImage"><see langword="true"/> also allows a <c>data:image</c> URL that is not SVG.</param>
+    /// <returns>The encoded URL, or an empty string.</returns>
     public string Url(string name, bool allowDataImage = false) => Html.Encode(Html.SafeUrl(Value(name), allowDataImage));
 
-    /// <summary>
-    /// Gets the style.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <returns>The style.</returns>
+    /// <summary><see cref="Value"/> passed through <see cref="Css.Clean"/>.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <returns>The cleaned declaration value.</returns>
     public string Style(string name) => Css.Clean(Value(name));
 
-    /// <summary>
-    /// Gets the bool.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <returns>true when the condition is met; otherwise, false.</returns>
+    /// <summary>Whether the prop is the text <c>true</c>, ignoring case.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <returns><see langword="true"/> when the value is <c>true</c>.</returns>
     public bool Bool(string name) => string.Equals(Value(name), "true", StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>
-    /// Gets the int.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <param name="fallback">The fallback.</param>
-    /// <returns>The int.</returns>
+    /// <summary>The prop parsed as an invariant decimal and rounded. Anything that does not parse returns <paramref name="fallback"/>.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <param name="fallback">The value used when the prop is missing or not a number. The default is 0.</param>
+    /// <returns>The rounded number, or <paramref name="fallback"/>.</returns>
     public int Int(string name, int fallback = 0) =>
         decimal.TryParse(Value(name), NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value) ? (int)Math.Round(value) : fallback;
 
-    /// <summary>
-    /// Renders the slot.
-    /// </summary>
-    /// <param name="slot">The slot.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the string.</returns>
+    /// <summary>Renders the children of a slot, in order, and joins the HTML. An empty slot returns an empty string.</summary>
+    /// <param name="slot">The slot name. The default is <see cref="SlotDefinition.Default"/>.</param>
+    /// <returns>The children's HTML.</returns>
     public async Task<string> RenderSlotAsync(string slot = SlotDefinition.Default)
     {
         var children = Node.ChildrenOf(slot);
@@ -155,10 +123,11 @@ public sealed class BlockRenderContext
     public string SlotAttributes(string slot = SlotDefinition.Default) => ToAttributeString(SlotAttributeMap(slot));
 
     /// <summary>
-    /// Gets the slot attribute map.
+    /// Editor attributes for the element that holds a slot. Empty when this is not an editor render.
+    /// The map has <c>data-pk-slot</c>, <c>data-pk-owner</c>, and <c>data-pk-slot-label</c>. An empty slot also has <c>data-pk-empty</c>.
     /// </summary>
-    /// <param name="slot">The slot.</param>
-    /// <returns>The slot attribute map.</returns>
+    /// <param name="slot">The slot name. The default is <see cref="SlotDefinition.Default"/>.</param>
+    /// <returns>The attributes, or an empty map.</returns>
     public IReadOnlyDictionary<string, object> SlotAttributeMap(string slot = SlotDefinition.Default)
     {
         if (!IsEditor)
@@ -186,11 +155,12 @@ public sealed class BlockRenderContext
     public string EditableAttributes(string name, bool rich = false) => ToAttributeString(EditableAttributeMap(name, rich));
 
     /// <summary>
-    /// Gets the editable attribute map.
+    /// Editor attributes for an element that can be edited in place. Empty when this is not an editor render.
+    /// The map has <c>data-pk-edit</c> and <c>data-pk-edit-kind</c> (<c>rich</c> or <c>plain</c>). A field that accepts tokens also has <c>data-pk-token</c>.
     /// </summary>
-    /// <param name="name">The name.</param>
-    /// <param name="rich">The rich.</param>
-    /// <returns>The editable attribute map.</returns>
+    /// <param name="name">The prop name.</param>
+    /// <param name="rich"><see langword="true"/> marks the field as rich text.</param>
+    /// <returns>The attributes, or an empty map.</returns>
     public IReadOnlyDictionary<string, object> EditableAttributeMap(string name, bool rich = false)
     {
         if (!IsEditor)

@@ -1,8 +1,6 @@
 namespace PageKrafter.Blocks.BuiltIn;
 
-/// <summary>
-/// Represents the heading block.
-/// </summary>
+/// <summary>A heading from h1 to h6, for web pages and emails. Double-clicking it edits the text, and the field accepts tokens.</summary>
 public sealed class HeadingBlock : BlockDefinition
 {
     /// <inheritdoc/>

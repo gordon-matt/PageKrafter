@@ -2,28 +2,20 @@ using System.Text.Json;
 
 namespace PageKrafter.Components.Panels;
 
-/// <summary>
-/// Represents the layer node.
-/// </summary>
+/// <summary>One block in the layers tree, with its children nested under it.</summary>
 public partial class LayerNode
 {
     private bool expanded = true;
 
-    /// <summary>
-    /// Gets or sets the editor.
-    /// </summary>
+    /// <summary>The editor that selects, moves, and deletes the block.</summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the node.
-    /// </summary>
+    /// <summary>The block this row represents.</summary>
     [Parameter, EditorRequired]
     public BlockNode Node { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the depth.
-    /// </summary>
+    /// <summary>How deep this row is. The page is zero.</summary>
     [Parameter]
     public int Depth { get; set; }
 

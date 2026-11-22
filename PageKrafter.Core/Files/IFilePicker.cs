@@ -26,21 +26,15 @@ public sealed record FilePickRequest(FilePickerKind Kind, string? Title = null, 
 /// <param name="Name">The file's name, when the file manager knows it.</param>
 public sealed record PickedFile(string Url, string? Name = null);
 
-/// <summary>
-/// Specifies the file picker kind.
-/// </summary>
+/// <summary>Which files the picker should offer. The JavaScript file picker sends the name in lower case.</summary>
 public enum FilePickerKind
 {
-    /// <summary>
-    /// The any value.
-    /// </summary>
+    /// <summary>Any file. The JavaScript kind is <c>any</c>.</summary>
     Any,
-    /// <summary>
-    /// The image value.
-    /// </summary>
+
+    /// <summary>An image. Image fields and section backgrounds use this. The JavaScript kind is <c>image</c>.</summary>
     Image,
-    /// <summary>
-    /// The video value.
-    /// </summary>
+
+    /// <summary>A video. The video block uses this. The JavaScript kind is <c>video</c>.</summary>
     Video,
 }

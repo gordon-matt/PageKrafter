@@ -3,9 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace PageKrafter;
 
-/// <summary>
-/// Provides extension methods for service collections.
-/// </summary>
+/// <summary>Registers rendering, the built-in blocks, and template storage without the Blazor editor.</summary>
 public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection services)
@@ -13,7 +11,11 @@ public static class ServiceCollectionExtensions
         /// <summary>
         /// Registers the block registry, renderer and template services without the Blazor editor.
         /// Use this where pages are only rendered, such as a public site. The editor's <c>AddPageKrafter</c> calls it.
+        /// A sanitizer, template store, registry, renderer, or file-root provider the host already registered is left in place.
+        /// Register a file-root provider before this call so each tenant can open its own folder.
         /// </summary>
+        /// <param name="configure">Adjusts the options. <see langword="null"/> keeps the defaults.</param>
+        /// <returns>The same service collection.</returns>
         public IServiceCollection AddPageKrafterCore(Action<PageKrafterOptions>? configure = null)
         {
             services.AddOptions<PageKrafterOptions>();
@@ -46,7 +48,12 @@ public static class ServiceCollectionExtensions
             return services;
         }
 
-        /// <summary>Adds a block type. Registering a type name that a built-in uses replaces the built-in.</summary>
+        /// <summary>
+        /// Adds a block type. Built-in definitions are applied first, so a host block that reuses a built-in type name replaces that built-in.
+        /// A later registration of the same type name replaces the earlier one. A type listed in <see cref="PageKrafterOptions.DisabledBlocks"/> is omitted, except the page block.
+        /// </summary>
+        /// <typeparam name="TBlock">The block type. It is created per scope, so it can take scoped services.</typeparam>
+        /// <returns>The same service collection.</returns>
         public IServiceCollection AddPageKrafterBlock<TBlock>()
             where TBlock : BlockDefinition
         {
@@ -54,11 +61,9 @@ public static class ServiceCollectionExtensions
             return services;
         }
 
-        /// <summary>
-        /// Adds the page krafter templates.
-        /// </summary>
-        /// <typeparam name="TProvider">The type of the provider.</typeparam>
-        /// <returns>The page krafter templates.</returns>
+        /// <summary>Adds a read-only template source. Every registered provider is listed. A second registration of the same type is ignored.</summary>
+        /// <typeparam name="TProvider">The provider type. It is created per scope.</typeparam>
+        /// <returns>The same service collection.</returns>
         public IServiceCollection AddPageKrafterTemplates<TProvider>()
             where TProvider : class, ITemplateProvider
         {
@@ -66,7 +71,9 @@ public static class ServiceCollectionExtensions
             return services;
         }
 
-        /// <summary>Replaces where saved templates are kept. The store is scoped so it can use a DbContext.</summary>
+        /// <summary>Replaces where saved templates are kept. The store is scoped so it can use a database context. The default store keeps templates in memory for the process.</summary>
+        /// <typeparam name="TStore">The store type.</typeparam>
+        /// <returns>The same service collection.</returns>
         public IServiceCollection AddPageKrafterTemplateStore<TStore>()
             where TStore : class, ITemplateStore
         {
@@ -75,10 +82,11 @@ public static class ServiceCollectionExtensions
         }
 
         /// <summary>
-        /// Adds the page krafter JSON file templates.
+        /// Replaces the template store with one JSON file per template in <paramref name="directory"/>.
+        /// The folder is created on the first save. An id that is not one to 64 letters, digits, underscores, or hyphens cannot be found, saved, or deleted.
         /// </summary>
-        /// <param name="directory">The directory.</param>
-        /// <returns>The page krafter JSON file templates.</returns>
+        /// <param name="directory">The folder that holds the template files.</param>
+        /// <returns>The same service collection.</returns>
         public IServiceCollection AddPageKrafterJsonFileTemplates(string directory)
         {
             services.Replace(ServiceDescriptor.Singleton<ITemplateStore>(new JsonFileTemplateStore(directory)));

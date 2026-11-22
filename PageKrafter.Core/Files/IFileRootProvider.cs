@@ -15,9 +15,6 @@ public interface IFileRootProvider
 /// <summary>The default: the picker opens whatever the host's file manager is configured to show.</summary>
 public sealed class DefaultFileRootProvider : IFileRootProvider
 {
-    /// <summary>
-    /// Gets the file root.
-    /// </summary>
-    /// <returns>The file root.</returns>
+    /// <inheritdoc/>
     public string? GetFileRoot() => null;
 }

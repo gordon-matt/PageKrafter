@@ -1,17 +1,13 @@
 namespace PageKrafter.Components.Panels;
 
-/// <summary>
-/// Represents the inspector.
-/// </summary>
+/// <summary>The settings for the selected block. Fields are grouped as Content, Style, and Advanced. A block with its own editor replaces the content fields.</summary>
 public partial class Inspector
 {
     private static readonly string[] GroupOrder = [FieldGroups.Content, FieldGroups.Style, FieldGroups.Advanced];
 
     private bool tokensOpen;
 
-    /// <summary>
-    /// Gets or sets the editor.
-    /// </summary>
+    /// <summary>The editor whose selection and document this panel reads.</summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

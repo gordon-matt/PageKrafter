@@ -1,13 +1,12 @@
 namespace PageKrafter.Blocks.BuiltIn;
 
 /// <summary>
-/// Represents the columns block.
+/// Side-by-side columns for web pages and emails, up to <see cref="MaxColumns"/>. Web columns can stack on phones.
+/// Reducing the column count moves the blocks from the removed columns into the last column that remains, and clears a width ratio that no longer matches.
 /// </summary>
 public sealed class ColumnsBlock : BlockDefinition
 {
-    /// <summary>
-    /// The max columns constant.
-    /// </summary>
+    /// <summary>The most columns one block can have. The value is 6.</summary>
     public const int MaxColumns = 6;
 
     private static readonly Dictionary<int, (string Value, string Label)[]> Presets = new()
@@ -55,22 +54,21 @@ public sealed class ColumnsBlock : BlockDefinition
         BlockField.Checkbox("stackOnMobile", "Stack on mobile", defaultValue: true) with { Modes = DocumentMode.Web },
     ];
 
-    /// <summary>
-    /// Counts of.
-    /// </summary>
-    /// <param name="node">The node.</param>
-    /// <returns>The int.</returns>
+    /// <summary>The column count, clamped from 1 to <see cref="MaxColumns"/>. A missing or unreadable count is 2.</summary>
+    /// <param name="node">The columns block.</param>
+    /// <returns>The count.</returns>
     public static int CountOf(BlockNode node) =>
         int.TryParse(node.Get("count"), NumberStyles.Integer, CultureInfo.InvariantCulture, out int count) ? Math.Clamp(count, 1, MaxColumns) : 2;
 
-    /// <summary>
-    /// Gets the slot name.
-    /// </summary>
-    /// <param name="index">The zero-based index.</param>
+    /// <summary>The slot name for a column. Index 0 is <c>col-1</c>.</summary>
+    /// <param name="index">The zero-based column index.</param>
     /// <returns>The slot name.</returns>
     public static string SlotName(int index) => $"col-{index + 1}";
 
     /// <summary>Reads a ratio like <c>1:2</c>. Anything that doesn't match the column count gives equal widths.</summary>
+    /// <param name="widths">The stored ratio. Separators are a colon, a comma, or a space.</param>
+    /// <param name="count">How many columns the block has.</param>
+    /// <returns>One positive weight per column.</returns>
     public static decimal[] ParseRatios(string? widths, int count)
     {
         string[] parts = (widths ?? string.Empty).Split([':', ',', ' '], StringSplitOptions.RemoveEmptyEntries);

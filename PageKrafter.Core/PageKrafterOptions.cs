@@ -1,8 +1,6 @@
 namespace PageKrafter;
 
-/// <summary>
-/// Represents the page krafter options.
-/// </summary>
+/// <summary>Settings for the canvas, the palette, and custom inspector fields.</summary>
 public sealed class PageKrafterOptions
 {
     /// <summary>Built-in or host block types to leave out, such as <c>html</c> when editors must not paste raw markup.</summary>
@@ -18,9 +16,7 @@ public sealed class PageKrafterOptions
     /// <summary>Extra markup for the canvas head, such as font links.</summary>
     public string? CanvasHeadHtml { get; set; }
 
-    /// <summary>
-    /// Gets or sets the history limit.
-    /// </summary>
+    /// <summary>How many undo snapshots are kept. The default is 100. A value below 1 is treated as 1.</summary>
     public int HistoryLimit { get; set; } = 100;
 
     /// <summary>Maps an editor name from <see cref="Blocks.BlockField.Editor"/> to a Razor component deriving from <c>FieldEditorBase</c>.</summary>

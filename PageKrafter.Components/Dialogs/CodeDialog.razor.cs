@@ -1,16 +1,12 @@
 namespace PageKrafter.Components.Dialogs;
 
-/// <summary>
-/// Represents the code dialog.
-/// </summary>
+/// <summary>Shows the HTML the current document exports. An email is a complete document. A web page is the body.</summary>
 public partial class CodeDialog
 {
     private bool open;
     private string html = string.Empty;
 
-    /// <summary>
-    /// Gets or sets the editor.
-    /// </summary>
+    /// <summary>The editor the dialog belongs to.</summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

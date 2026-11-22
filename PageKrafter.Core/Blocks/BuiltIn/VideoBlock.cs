@@ -3,7 +3,8 @@ using System.Text.RegularExpressions;
 namespace PageKrafter.Blocks.BuiltIn;
 
 /// <summary>
-/// Represents the video block.
+/// A web-only video. A YouTube or Vimeo link becomes an embed, and an mp4, webm, or ogg link becomes a video element.
+/// Anything else is a placeholder in the editor and is omitted from exported HTML.
 /// </summary>
 public sealed partial class VideoBlock : BlockDefinition
 {
@@ -29,11 +30,9 @@ public sealed partial class VideoBlock : BlockDefinition
         BlockField.Select("aspect", "Aspect ratio", "16:9", ("16:9", "16:9"), ("4:3", "4:3"), ("1:1", "Square"), ("21:9", "21:9")),
     ];
 
-    /// <summary>
-    /// Gets the embed URL.
-    /// </summary>
-    /// <param name="url">The URL.</param>
-    /// <returns>The embed URL.</returns>
+    /// <summary>The YouTube or Vimeo embed address for a watch, share, short, live, or player link. YouTube uses the nocookie host.</summary>
+    /// <param name="url">The link the editor typed.</param>
+    /// <returns>The embed address, or <see langword="null"/> when the link is neither.</returns>
     public static string? EmbedUrl(string? url)
     {
         if (string.IsNullOrWhiteSpace(url))

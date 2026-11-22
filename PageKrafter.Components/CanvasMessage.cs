@@ -3,59 +3,37 @@ namespace PageKrafter.Components;
 /// <summary>A message from the canvas iframe, relayed by pagekrafter.js. One flat shape keeps the JS side simple.</summary>
 public sealed record CanvasMessage
 {
-    /// <summary>
-    /// Gets or sets the type.
-    /// </summary>
+    /// <summary><c>select</c>, <c>drop</c>, <c>command</c>, or <c>inline</c>.</summary>
     public string Type { get; init; } = string.Empty;
 
-    /// <summary>
-    /// Gets or sets the identifier.
-    /// </summary>
+    /// <summary>The block the message is about. A drop that moves a block uses this as the block being moved.</summary>
     public string? Id { get; init; }
 
-    /// <summary>
-    /// Gets or sets the parent identifier.
-    /// </summary>
+    /// <summary>The block that receives a drop.</summary>
     public string? ParentId { get; init; }
 
-    /// <summary>
-    /// Gets or sets the slot.
-    /// </summary>
+    /// <summary>The slot that receives a drop.</summary>
     public string? Slot { get; init; }
 
-    /// <summary>
-    /// Gets or sets the index.
-    /// </summary>
+    /// <summary>The position in that slot, starting at zero.</summary>
     public int Index { get; init; }
 
-    /// <summary>
-    /// Gets or sets the kind.
-    /// </summary>
+    /// <summary>For a drop, <c>block</c>, <c>template</c>, or <c>move</c>. For an inline edit, <c>rich</c> or plain.</summary>
     public string? Kind { get; init; }
 
-    /// <summary>
-    /// Gets or sets the block type.
-    /// </summary>
+    /// <summary>The block type to insert when <see cref="Kind"/> is <c>block</c>.</summary>
     public string? BlockType { get; init; }
 
-    /// <summary>
-    /// Gets or sets the template identifier.
-    /// </summary>
+    /// <summary>The section template to insert when <see cref="Kind"/> is <c>template</c>.</summary>
     public string? TemplateId { get; init; }
 
-    /// <summary>
-    /// Gets or sets the prop.
-    /// </summary>
+    /// <summary>The prop an inline edit writes.</summary>
     public string? Prop { get; init; }
 
-    /// <summary>
-    /// Gets or sets the value.
-    /// </summary>
+    /// <summary>The text an inline edit writes.</summary>
     public string? Value { get; init; }
 
-    /// <summary>
-    /// Gets or sets the command.
-    /// </summary>
+    /// <summary>A canvas command: <c>undo</c>, <c>redo</c>, <c>deselect</c>, <c>delete</c>, <c>duplicate</c>, <c>up</c>, <c>down</c>, <c>parent</c>, or <c>save-template</c>.</summary>
     public string? Command { get; init; }
 }
 

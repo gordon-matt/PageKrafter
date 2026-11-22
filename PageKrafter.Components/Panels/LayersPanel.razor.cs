@@ -1,13 +1,9 @@
 namespace PageKrafter.Components.Panels;
 
-/// <summary>
-/// Represents the layers panel.
-/// </summary>
+/// <summary>The document as a tree, starting at the page. Selecting a row selects that block on the canvas.</summary>
 public partial class LayersPanel
 {
-    /// <summary>
-    /// Gets or sets the editor.
-    /// </summary>
+    /// <summary>The editor whose document this panel shows.</summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 }

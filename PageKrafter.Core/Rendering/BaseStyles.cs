@@ -6,14 +6,10 @@ namespace PageKrafter.Rendering;
 /// </summary>
 public static class BaseStyles
 {
-    /// <summary>
-    /// The mobile breakpoint constant.
-    /// </summary>
+    /// <summary>The width, in pixels, at which web columns stack and the hide-on-mobile rules apply. The value is 768.</summary>
     public const int MobileBreakpoint = 768;
 
-    /// <summary>
-    /// The web constant.
-    /// </summary>
+    /// <summary>The web layout rules, including column stacking below 768 pixels and the hide-on-mobile and hide-on-desktop classes.</summary>
     public const string Web =
         ".pk-page{box-sizing:border-box}" +
         ".pk-page *,.pk-page *::before,.pk-page *::after{box-sizing:inherit}" +
@@ -33,9 +29,7 @@ public static class BaseStyles
         ".pk-hide-mobile{display:none!important}}" +
         "@media (min-width:768px){.pk-hide-desktop{display:none!important}}";
 
-    /// <summary>
-    /// The email constant.
-    /// </summary>
+    /// <summary>The email layout rules. Columns stack below 620 pixels.</summary>
     public const string Email =
         "body{margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}" +
         "table,td{border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt}" +
@@ -45,10 +39,8 @@ public static class BaseStyles
         ".pk-email-body{width:100%!important}" +
         ".pk-email-col{display:block!important;width:100%!important;padding-left:0!important;padding-right:0!important;padding-bottom:16px!important}}";
 
-    /// <summary>
-    /// Gets the for.
-    /// </summary>
-    /// <param name="mode">The mode.</param>
-    /// <returns>The for.</returns>
+    /// <summary>The style block for a document. Email uses <see cref="Email"/>. Web and any other mode use <see cref="Web"/>.</summary>
+    /// <param name="mode">The document mode.</param>
+    /// <returns>The CSS.</returns>
     public static string For(DocumentMode mode) => mode == DocumentMode.Email ? Email : Web;
 }

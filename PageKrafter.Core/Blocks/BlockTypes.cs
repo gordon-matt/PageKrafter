@@ -1,56 +1,41 @@
 namespace PageKrafter.Blocks;
 
-/// <summary>
-/// Provides block types.
-/// </summary>
+/// <summary>Type keys of the built-in blocks. A host block should use its own prefix so these names stay free.</summary>
 public static class BlockTypes
 {
-    /// <summary>
-    /// The page constant.
-    /// </summary>
+    /// <summary>The page root. The value is <c>page</c>.</summary>
     public const string Page = "page";
-    /// <summary>
-    /// The section constant.
-    /// </summary>
+
+    /// <summary>A full-width band. The value is <c>section</c>.</summary>
     public const string Section = "section";
-    /// <summary>
-    /// The columns constant.
-    /// </summary>
+
+    /// <summary>Side-by-side columns. The value is <c>columns</c>.</summary>
     public const string Columns = "columns";
-    /// <summary>
-    /// The container constant.
-    /// </summary>
+
+    /// <summary>A grouping box. The value is <c>container</c>.</summary>
     public const string Container = "container";
-    /// <summary>
-    /// The heading constant.
-    /// </summary>
+
+    /// <summary>A heading. The value is <c>heading</c>.</summary>
     public const string Heading = "heading";
-    /// <summary>
-    /// The text constant.
-    /// </summary>
+
+    /// <summary>Rich text. The value is <c>text</c>.</summary>
     public const string Text = "text";
-    /// <summary>
-    /// The image constant.
-    /// </summary>
+
+    /// <summary>An image. The value is <c>image</c>.</summary>
     public const string Image = "image";
-    /// <summary>
-    /// The button constant.
-    /// </summary>
+
+    /// <summary>A link styled as a button. The value is <c>button</c>.</summary>
     public const string Button = "button";
-    /// <summary>
-    /// The divider constant.
-    /// </summary>
+
+    /// <summary>A horizontal line. The value is <c>divider</c>.</summary>
     public const string Divider = "divider";
-    /// <summary>
-    /// The spacer constant.
-    /// </summary>
+
+    /// <summary>Empty vertical space. The value is <c>spacer</c>.</summary>
     public const string Spacer = "spacer";
-    /// <summary>
-    /// The video constant.
-    /// </summary>
+
+    /// <summary>A video. The value is <c>video</c>. It is web only.</summary>
     public const string Video = "video";
-    /// <summary>
-    /// The HTML constant.
-    /// </summary>
+
+    /// <summary>Sanitized raw markup. The value is <c>html</c>.</summary>
     public const string Html = "html";
 }

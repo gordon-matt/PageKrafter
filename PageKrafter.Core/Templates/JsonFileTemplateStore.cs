@@ -8,16 +8,12 @@ public sealed partial class JsonFileTemplateStore(string directory) : ITemplateS
 {
     private readonly SemaphoreSlim gate = new(1, 1);
 
-    /// <summary>
-    /// Gets the directory.
-    /// </summary>
+    /// <summary>The folder that holds one <c>{id}.json</c> file per template.</summary>
     public string Directory { get; } = directory;
 
-    /// <summary>
-    /// Lists the value.
-    /// </summary>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the page templates.</returns>
+    /// <summary>Reads every JSON file in the folder. A missing folder, a file that is not a template, and a file that cannot be read are skipped.</summary>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <returns>The templates that could be read.</returns>
     public async Task<IReadOnlyList<PageTemplate>> ListAsync(CancellationToken cancellationToken = default)
     {
         if (!System.IO.Directory.Exists(Directory))
@@ -38,24 +34,21 @@ public sealed partial class JsonFileTemplateStore(string directory) : ITemplateS
         return templates;
     }
 
-    /// <summary>
-    /// Finds the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the page template.</returns>
+    /// <summary>Reads <c>{id}.json</c>. An id that is not one to 64 letters, digits, underscores, or hyphens is treated as missing.</summary>
+    /// <param name="id">The template id.</param>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <returns>The template, or <see langword="null"/> when the file is missing, unreadable, or not a template.</returns>
     public async Task<PageTemplate?> FindAsync(string id, CancellationToken cancellationToken = default)
     {
         string? path = PathFor(id);
         return path is not null && File.Exists(path) ? await ReadAsync(path, cancellationToken) : null;
     }
 
-    /// <summary>
-    /// Saves the value.
-    /// </summary>
-    /// <param name="template">The template.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <summary>Writes <c>{id}.json</c> through a temporary file, creating the folder when it does not exist.</summary>
+    /// <param name="template">The template to store.</param>
+    /// <param name="cancellationToken">Cancels the write.</param>
+    /// <returns>A task that completes when the file has been replaced.</returns>
+    /// <exception cref="ArgumentException">The template id is not one to 64 letters, digits, underscores, or hyphens.</exception>
     public async Task SaveAsync(PageTemplate template, CancellationToken cancellationToken = default)
     {
         string path = PathFor(template.Id) ?? throw new ArgumentException($"\"{template.Id}\" is not a valid template id.", nameof(template));
@@ -73,12 +66,10 @@ public sealed partial class JsonFileTemplateStore(string directory) : ITemplateS
         }
     }
 
-    /// <summary>
-    /// Deletes the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is true when the condition is met; otherwise, false.</returns>
+    /// <summary>Deletes <c>{id}.json</c>. A disallowed id or a missing file returns <see langword="false"/>.</summary>
+    /// <param name="id">The template id.</param>
+    /// <param name="cancellationToken">Cancels the delete.</param>
+    /// <returns><see langword="true"/> when the file was deleted.</returns>
     public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
         string? path = PathFor(id);

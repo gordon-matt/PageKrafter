@@ -1,8 +1,6 @@
 namespace PageKrafter.Blocks.BuiltIn;
 
-/// <summary>
-/// Represents the text block.
-/// </summary>
+/// <summary>Rich text for web pages and emails. Double-clicking it on the canvas edits it in place, and the field accepts tokens.</summary>
 public sealed class TextBlock : BlockDefinition
 {
     /// <inheritdoc/>

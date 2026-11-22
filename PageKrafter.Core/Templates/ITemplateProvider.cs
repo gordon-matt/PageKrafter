@@ -6,11 +6,9 @@ namespace PageKrafter.Templates;
 /// </summary>
 public interface ITemplateProvider
 {
-    /// <summary>
-    /// Gets the templates.
-    /// </summary>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the page templates.</returns>
+    /// <summary>The templates this source offers. The template service marks them read-only, so editors can use them but not change or delete them.</summary>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <returns>The templates.</returns>
     Task<IReadOnlyList<PageTemplate>> GetTemplatesAsync(CancellationToken cancellationToken = default);
 }
 
@@ -20,34 +18,26 @@ public interface ITemplateProvider
 /// </summary>
 public interface ITemplateStore
 {
-    /// <summary>
-    /// Lists the value.
-    /// </summary>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the page templates.</returns>
+    /// <summary>The templates editors have saved. Read-only provider templates are not included.</summary>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <returns>The saved templates.</returns>
     Task<IReadOnlyList<PageTemplate>> ListAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Finds the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the page template.</returns>
+    /// <summary>The saved template with this id.</summary>
+    /// <param name="id">The template id.</param>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <returns>The template, or <see langword="null"/> when it is not in the store.</returns>
     Task<PageTemplate?> FindAsync(string id, CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Saves the value.
-    /// </summary>
-    /// <param name="template">The template.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <summary>Stores the template, replacing one that already has the same id.</summary>
+    /// <param name="template">The template to store.</param>
+    /// <param name="cancellationToken">Cancels the write.</param>
+    /// <returns>A task that completes when the template is stored.</returns>
     Task SaveAsync(PageTemplate template, CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Deletes the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is true when the condition is met; otherwise, false.</returns>
+    /// <summary>Removes the saved template.</summary>
+    /// <param name="id">The template id.</param>
+    /// <param name="cancellationToken">Cancels the delete.</param>
+    /// <returns><see langword="true"/> when a template was removed.</returns>
     Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default);
 }

@@ -41,9 +41,7 @@ public partial class PageKrafterEditor
     [Parameter]
     public string? Value { get; set; }
 
-    /// <summary>
-    /// Gets or sets the value changed.
-    /// </summary>
+    /// <summary>Raised with the document JSON after each edit. Bind it with <see cref="Value"/>.</summary>
     [Parameter]
     public EventCallback<string?> ValueChanged { get; set; }
 
@@ -55,9 +53,7 @@ public partial class PageKrafterEditor
     [Parameter]
     public EventCallback<PageDocument> OnSave { get; set; }
 
-    /// <summary>
-    /// Gets or sets the height.
-    /// </summary>
+    /// <summary>The CSS height of the editor. The default is <c>80vh</c>.</summary>
     [Parameter]
     public string Height { get; set; } = "80vh";
 
@@ -69,9 +65,7 @@ public partial class PageKrafterEditor
     [Parameter]
     public IReadOnlyCollection<string>? AllowedBlocks { get; set; }
 
-    /// <summary>
-    /// Gets or sets a value indicating whether this instance is show templates.
-    /// </summary>
+    /// <summary><see langword="false"/> hides the Templates tab. The default is <see langword="true"/>.</summary>
     [Parameter]
     public bool ShowTemplates { get; set; } = true;
 
@@ -119,9 +113,7 @@ public partial class PageKrafterEditor
     [Inject]
     private IServiceProvider Services { get; set; } = default!;
 
-    /// <summary>
-    /// Gets the document.
-    /// </summary>
+    /// <summary>The document currently in the editor, including changes that have not been saved by the host.</summary>
     public PageDocument Document => Session.Document;
 
     internal EditorSession Session { get; private set; } = default!;
@@ -140,19 +132,19 @@ public partial class PageKrafterEditor
             ? []
             : Tokens.Where(token => token is not null && !string.IsNullOrWhiteSpace(token.Value)).ToArray();
 
-    /// <summary>
-    /// Exports the HTML.
-    /// </summary>
-    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the string.</returns>
+    /// <summary>Renders the current document as HTML for storage. Editor attributes are omitted and the base styles are included.</summary>
+    /// <param name="cancellationToken">Cancels the render.</param>
+    /// <returns>The body HTML.</returns>
     public Task<string> ExportHtmlAsync(CancellationToken cancellationToken = default) =>
         Renderer.RenderAsync(Session.Document, RenderOptions.Export, cancellationToken);
 
     /// <summary>
-    /// Handles the canvas message event.
+    /// Applies a message from the canvas. <c>select</c> changes the selection, <c>drop</c> inserts or moves a block,
+    /// <c>command</c> runs undo, redo, delete, duplicate, a move, or save-as-template, and <c>inline</c> writes a double-clicked field.
+    /// Rich inline text is sanitized. Plain inline text has its whitespace collapsed.
     /// </summary>
-    /// <param name="message">The message.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <param name="message">The message from the canvas script.</param>
+    /// <returns>A task that completes when the document and canvas have been updated.</returns>
     [JSInvokable]
     public async Task OnCanvasMessage(CanvasMessage message)
     {

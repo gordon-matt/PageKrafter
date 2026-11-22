@@ -6,56 +6,39 @@ namespace PageKrafter.Documents;
 /// </summary>
 public sealed class PageDocument
 {
-    /// <summary>
-    /// The current version constant.
-    /// </summary>
+    /// <summary>The document version written into new JSON. The value is 1.</summary>
     public const int CurrentVersion = 1;
-    /// <summary>
-    /// The root identifier constant.
-    /// </summary>
+
+    /// <summary>The id of the page block. The value is <c>root</c>.</summary>
     public const string RootId = "root";
 
-    /// <summary>
-    /// Gets or sets the version.
-    /// </summary>
+    /// <summary>The document version. New documents use <see cref="CurrentVersion"/>.</summary>
     public int Version { get; set; } = CurrentVersion;
 
-    /// <summary>
-    /// Gets or sets the mode.
-    /// </summary>
+    /// <summary>Web or email. A value that is neither is read back as web.</summary>
     public DocumentMode Mode { get; set; } = DocumentMode.Web;
 
-    /// <summary>
-    /// Gets or sets the root.
-    /// </summary>
+    /// <summary>The page block. Its children are the sections and other top-level blocks.</summary>
     public BlockNode Root { get; set; } = NewRoot();
 
-    /// <summary>
-    /// Creates the value.
-    /// </summary>
-    /// <param name="mode">The mode.</param>
-    /// <returns>The page document.</returns>
+    /// <summary>A new document with an empty page block.</summary>
+    /// <param name="mode">Web or email. The default is web.</param>
+    /// <returns>The document.</returns>
     public static PageDocument Create(DocumentMode mode = DocumentMode.Web) => new() { Mode = mode };
 
-    /// <summary>
-    /// Gets the new root.
-    /// </summary>
-    /// <returns>The new root.</returns>
+    /// <summary>An empty page block whose id is <see cref="RootId"/>.</summary>
+    /// <returns>The page block.</returns>
     public static BlockNode NewRoot() => new() { Id = RootId, Type = BlockTypes.Page };
 
-    /// <summary>
-    /// Finds the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <returns>The block node.</returns>
+    /// <summary>The block with this id, including the root. The comparison is case-sensitive.</summary>
+    /// <param name="id">The block id. <see langword="null"/> matches nothing.</param>
+    /// <returns>The block, or <see langword="null"/> when no block has that id.</returns>
     public BlockNode? Find(string? id) =>
         id is null ? null : Root.DescendantsAndSelf().FirstOrDefault(node => string.Equals(node.Id, id, StringComparison.Ordinal));
 
-    /// <summary>
-    /// Locates the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <returns>The node location.</returns>
+    /// <summary>The parent, slot, and index of a block. The root has no location.</summary>
+    /// <param name="id">The block id. <see langword="null"/> matches nothing.</param>
+    /// <returns>The location, or <see langword="null"/> for the root or an unknown id.</returns>
     public NodeLocation? Locate(string? id)
     {
         if (id is null)
@@ -78,9 +61,7 @@ public sealed class PageDocument
         return null;
     }
 
-    /// <summary>
-    /// Clones the value.
-    /// </summary>
-    /// <returns>The page document.</returns>
+    /// <summary>A copy of the document, including the tree. Ids are kept.</summary>
+    /// <returns>The copy.</returns>
     public PageDocument Clone() => new() { Version = Version, Mode = Mode, Root = Root.Clone() };
 }

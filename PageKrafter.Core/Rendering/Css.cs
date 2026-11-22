@@ -9,10 +9,12 @@ namespace PageKrafter.Rendering;
 public static partial class Css
 {
     /// <summary>
-    /// Gets the clean.
+    /// A declaration value that cannot break out of the property. Blank text returns empty.
+    /// A value containing <c>expression(</c>, <c>javascript:</c>, or <c>@import</c> returns empty.
+    /// Semicolons, braces, angle brackets, quotes, backslashes, and control characters are removed.
     /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The clean.</returns>
+    /// <param name="value">The typed value.</param>
+    /// <returns>The cleaned value, or an empty string.</returns>
     public static string Clean(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -29,10 +31,11 @@ public static partial class Css
     }
 
     /// <summary>
-    /// Gets the URL value.
+    /// A <c>url('...')</c> value. The address must pass <see cref="Html.SafeUrl"/> with data images allowed.
+    /// Quotes, parentheses, and backslashes in the address are percent-encoded.
     /// </summary>
-    /// <param name="url">The URL.</param>
-    /// <returns>The URL value.</returns>
+    /// <param name="url">The address.</param>
+    /// <returns>The function, or an empty string when the address is rejected.</returns>
     public static string UrlValue(string? url)
     {
         string safe = Html.SafeUrl(url, allowDataImage: true);
@@ -41,21 +44,17 @@ public static partial class Css
             : $"url('{safe.Replace("'", "%27").Replace("(", "%28").Replace(")", "%29").Replace("\"", "%22").Replace("\\", "%5C")}')";
     }
 
-    /// <summary>
-    /// Gets the class names.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The class names.</returns>
+    /// <summary>The space-separated names that look like CSS class names. Anything else is dropped.</summary>
+    /// <param name="value">The typed class list.</param>
+    /// <returns>The kept names, separated by spaces, or an empty string.</returns>
     public static string ClassNames(string? value) =>
         string.IsNullOrWhiteSpace(value)
             ? string.Empty
             : string.Join(' ', value.Split(' ', StringSplitOptions.RemoveEmptyEntries).Where(name => ClassNamePattern().IsMatch(name)));
 
-    /// <summary>
-    /// Gets the identifier.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The identifier.</returns>
+    /// <summary>The trimmed value when it is a usable element id: a letter, then letters, digits, underscores, colons, dots, or hyphens.</summary>
+    /// <param name="value">The typed id.</param>
+    /// <returns>The id, or an empty string.</returns>
     public static string Identifier(string? value) =>
         !string.IsNullOrWhiteSpace(value) && IdentifierPattern().IsMatch(value.Trim()) ? value.Trim() : string.Empty;
 

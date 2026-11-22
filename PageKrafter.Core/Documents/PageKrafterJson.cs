@@ -3,31 +3,30 @@ using System.Text.Json.Serialization;
 
 namespace PageKrafter.Documents;
 
-/// <summary>
-/// Provides page krafter JSON.
-/// </summary>
+/// <summary>Reads and writes a <see cref="PageDocument"/>. Enums are stored as names. Web defaults are used, so property names are camel case.</summary>
 public static class PageKrafterJson
 {
-    /// <summary>
-    /// Gets the options.
-    /// </summary>
+    /// <summary>Serializer options for stored JSON. The output is one line.</summary>
     public static JsonSerializerOptions Options { get; } = Create(indented: false);
 
-    /// <summary>
-    /// Gets the indented options.
-    /// </summary>
+    /// <summary>The same options as <see cref="Options"/>, with indentation. Template files use these.</summary>
     public static JsonSerializerOptions IndentedOptions { get; } = Create(indented: true);
 
-    /// <summary>
-    /// Serializes the value.
-    /// </summary>
+    /// <summary>Writes the document as JSON.</summary>
     /// <param name="document">The document.</param>
-    /// <param name="indented">The indented.</param>
-    /// <returns>The string.</returns>
+    /// <param name="indented"><see langword="true"/> breaks the JSON across lines.</param>
+    /// <returns>The JSON.</returns>
     public static string Serialize(PageDocument document, bool indented = false) =>
         JsonSerializer.Serialize(document, indented ? IndentedOptions : Options);
 
-    /// <summary>An empty or blank string gives a new document so hosts can bind a brand new field.</summary>
+    /// <summary>
+    /// Reads a document. An empty or blank string gives a new document so hosts can bind a brand new field.
+    /// JSON that does not parse returns invalid, with the parser message. A document that deserializes as null says "The page data is empty."
+    /// A successful read is passed through <see cref="Normalize"/>.
+    /// </summary>
+    /// <param name="json">The stored JSON, or blank for a new document.</param>
+    /// <param name="fallbackMode">The mode of a new document. The default is web.</param>
+    /// <returns>The document, or invalid.</returns>
     public static Result<PageDocument> Deserialize(string? json, DocumentMode fallbackMode = DocumentMode.Web)
     {
         if (string.IsNullOrWhiteSpace(json))
@@ -55,7 +54,9 @@ public static class PageKrafterJson
     /// <summary>
     /// Repairs data written by hand or by older versions: missing collections, null values,
     /// a missing root and duplicate ids (which would break selection in the canvas).
+    /// The root type becomes <c>page</c>, a blank root id becomes <c>root</c>, and a mode other than web or email becomes web.
     /// </summary>
+    /// <param name="document">The document, changed in place.</param>
     public static void Normalize(PageDocument document)
     {
         document.Root ??= PageDocument.NewRoot();

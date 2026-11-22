@@ -2,9 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace PageKrafter.Components.Panels;
 
-/// <summary>
-/// Represents the field input.
-/// </summary>
+/// <summary>One inspector field. A registered custom editor replaces the built-in input. Image and file fields show Browse when a file picker is registered.</summary>
 public partial class FieldInput
 {
     private string? optionsKey;
@@ -12,27 +10,19 @@ public partial class FieldInput
     private string? pickError;
     private IFilePicker? picker;
 
-    /// <summary>
-    /// Gets or sets the editor.
-    /// </summary>
+    /// <summary>The editor that records the change.</summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the node.
-    /// </summary>
+    /// <summary>The block that owns the field.</summary>
     [Parameter, EditorRequired]
     public BlockNode Node { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the definition.
-    /// </summary>
+    /// <summary>The block definition, used when the field loads its choices.</summary>
     [Parameter, EditorRequired]
     public BlockDefinition Definition { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the field.
-    /// </summary>
+    /// <summary>The field to draw.</summary>
     [Parameter, EditorRequired]
     public BlockField Field { get; set; } = default!;
 

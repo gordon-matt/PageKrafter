@@ -15,21 +15,18 @@ public sealed class EditHistory(int limit = 100, TimeProvider? timeProvider = nu
     private string? lastKey;
     private DateTimeOffset lastAt;
 
-    /// <summary>
-    /// Gets a value indicating whether this instance can undo.
-    /// </summary>
+    /// <summary><see langword="true"/> when <see cref="Undo(string)"/> can restore an earlier snapshot.</summary>
     public bool CanUndo => undo.Count > 0;
 
-    /// <summary>
-    /// Gets a value indicating whether this instance can redo.
-    /// </summary>
+    /// <summary><see langword="true"/> when <see cref="Redo(string)"/> can restore a snapshot that was undone.</summary>
     public bool CanRedo => redo.Count > 0;
 
     /// <summary>
-    /// Performs the record operation.
+    /// Stores the document as it was before a change. The same <paramref name="coalesceKey"/> inside <see cref="CoalesceWindow"/> does not add another step, so typing stays one undo.
+    /// Recording always clears redo. A limit below 1 keeps one snapshot, and the oldest snapshot is dropped past the limit.
     /// </summary>
-    /// <param name="snapshot">The snapshot.</param>
-    /// <param name="coalesceKey">The coalesce key.</param>
+    /// <param name="snapshot">The document JSON from before the change.</param>
+    /// <param name="coalesceKey">A key such as one field. <see langword="null"/> always starts a new step.</param>
     public void Record(string snapshot, string? coalesceKey = null)
     {
         var now = time.GetUtcNow();
@@ -53,11 +50,9 @@ public sealed class EditHistory(int limit = 100, TimeProvider? timeProvider = nu
         }
     }
 
-    /// <summary>
-    /// Gets the undo.
-    /// </summary>
-    /// <param name="current">The current.</param>
-    /// <returns>The undo.</returns>
+    /// <summary>Restores the latest snapshot and keeps <paramref name="current"/> for redo.</summary>
+    /// <param name="current">The document JSON to put on the redo stack.</param>
+    /// <returns>The snapshot to restore, or <see langword="null"/> when there is nothing to undo.</returns>
     public string? Undo(string current)
     {
         if (undo.Last is not { } last)
@@ -71,11 +66,9 @@ public sealed class EditHistory(int limit = 100, TimeProvider? timeProvider = nu
         return last.Value;
     }
 
-    /// <summary>
-    /// Gets the redo.
-    /// </summary>
-    /// <param name="current">The current.</param>
-    /// <returns>The redo.</returns>
+    /// <summary>Restores the snapshot that was undone and keeps <paramref name="current"/> for undo.</summary>
+    /// <param name="current">The document JSON to put on the undo stack.</param>
+    /// <returns>The snapshot to restore, or <see langword="null"/> when there is nothing to redo.</returns>
     public string? Redo(string current)
     {
         if (!redo.TryPop(out string? next))
@@ -88,9 +81,7 @@ public sealed class EditHistory(int limit = 100, TimeProvider? timeProvider = nu
         return next;
     }
 
-    /// <summary>
-    /// Clears the value.
-    /// </summary>
+    /// <summary>Drops the undo and redo stacks and the coalesce key.</summary>
     public void Clear()
     {
         undo.Clear();

@@ -3,14 +3,10 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace PageKrafter.Components.Panels;
 
-/// <summary>
-/// Represents the template panel.
-/// </summary>
+/// <summary>Section templates that can be dragged onto the page, and page templates that replace the document. Saved templates can be deleted. Built-in ones cannot.</summary>
 public partial class TemplatePanel
 {
-    /// <summary>
-    /// Gets or sets the editor.
-    /// </summary>
+    /// <summary>The editor that inserts or applies the template.</summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

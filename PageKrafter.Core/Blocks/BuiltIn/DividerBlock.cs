@@ -1,8 +1,6 @@
 namespace PageKrafter.Blocks.BuiltIn;
 
-/// <summary>
-/// Represents the divider block.
-/// </summary>
+/// <summary>A horizontal line, for web pages and emails.</summary>
 public sealed class DividerBlock : BlockDefinition
 {
     /// <inheritdoc/>

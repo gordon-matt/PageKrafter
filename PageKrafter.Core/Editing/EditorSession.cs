@@ -11,14 +11,12 @@ public sealed class EditorSession
     private readonly EditHistory history;
     private readonly Func<BlockDefinition, bool>? filter;
 
-    /// <summary>
-    /// Initializes a new instance of the EditorSession class.
-    /// </summary>
-    /// <param name="registry">The registry.</param>
-    /// <param name="document">The document.</param>
-    /// <param name="historyLimit">The history limit.</param>
-    /// <param name="filter">The filter.</param>
-    /// <param name="timeProvider">The time provider.</param>
+    /// <summary>Starts a session for one document. The history is empty and nothing is selected.</summary>
+    /// <param name="registry">The blocks the session can insert.</param>
+    /// <param name="document">The document to edit.</param>
+    /// <param name="historyLimit">How many undo snapshots to keep. The default is 100, and a value below 1 keeps one.</param>
+    /// <param name="filter">An extra palette filter. <see langword="null"/> allows every block the registry offers for the document mode, except the page block.</param>
+    /// <param name="timeProvider">The clock for the typing window. <see langword="null"/> uses the system clock.</param>
     public EditorSession(
         BlockRegistry registry,
         PageDocument document,
@@ -32,45 +30,31 @@ public sealed class EditorSession
         Document = document;
     }
 
-    /// <summary>
-    /// Gets or sets the document.
-    /// </summary>
+    /// <summary>The document being edited. <see cref="Load"/> replaces it.</summary>
     public PageDocument Document { get; private set; }
 
-    /// <summary>
-    /// Gets or sets the selected identifier.
-    /// </summary>
+    /// <summary>The selected block id, or <see langword="null"/> when nothing is selected.</summary>
     public string? SelectedId { get; private set; }
 
-    /// <summary>
-    /// Gets the selected.
-    /// </summary>
+    /// <summary>The selected block, or <see langword="null"/> when nothing is selected or the id is gone.</summary>
     public BlockNode? Selected => Document.Find(SelectedId);
 
-    /// <summary>
-    /// Gets a value indicating whether this instance can undo.
-    /// </summary>
+    /// <summary><see langword="true"/> when undo can restore an earlier document.</summary>
     public bool CanUndo => history.CanUndo;
 
-    /// <summary>
-    /// Gets a value indicating whether this instance can redo.
-    /// </summary>
+    /// <summary><see langword="true"/> when redo can restore a document that was undone.</summary>
     public bool CanRedo => history.CanRedo;
 
-    /// <summary>
-    /// Determines whether this instance is allowed.
-    /// </summary>
-    /// <param name="definition">The definition.</param>
-    /// <returns>true when the condition is met; otherwise, false.</returns>
+    /// <summary>Whether the block can be added: it is not the page block, it includes the document mode, and the session filter allows it.</summary>
+    /// <param name="definition">The block.</param>
+    /// <returns><see langword="true"/> when it can be inserted.</returns>
     public bool IsAllowed(BlockDefinition definition) =>
         definition.Type != BlockTypes.Page
         && definition.Modes.HasFlag(Document.Mode)
         && (filter?.Invoke(definition) ?? true);
 
-    /// <summary>
-    /// Loads the value.
-    /// </summary>
-    /// <param name="document">The document.</param>
+    /// <summary>Replaces the document, clears the selection, and drops the undo history.</summary>
+    /// <param name="document">The document to edit.</param>
     public void Load(PageDocument document)
     {
         Document = document;
@@ -78,20 +62,16 @@ public sealed class EditorSession
         history.Clear();
     }
 
-    /// <summary>
-    /// Selects the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
+    /// <summary>Selects the block when it exists. An unknown id, or <see langword="null"/>, clears the selection.</summary>
+    /// <param name="id">The block id.</param>
     public void Select(string? id) => SelectedId = Document.Find(id) is not null ? id : null;
 
-    /// <summary>
-    /// Inserts the value.
-    /// </summary>
-    /// <param name="blockType">The block type.</param>
-    /// <param name="parentId">The parent identifier.</param>
-    /// <param name="slot">The slot.</param>
-    /// <param name="index">The zero-based index.</param>
-    /// <returns>The outcome for the string.</returns>
+    /// <summary>Creates a block and inserts it. An unknown or disallowed type is invalid with "That block isn't available here."</summary>
+    /// <param name="blockType">The block type key.</param>
+    /// <param name="parentId">The block that receives it.</param>
+    /// <param name="slot">The slot name.</param>
+    /// <param name="index">The position in the slot. A value past the end is clamped.</param>
+    /// <returns>The new block id, or invalid when the block cannot go there.</returns>
     public Result<string> Insert(string blockType, string parentId, string slot, int index)
     {
         var definition = registry.Find(blockType);
@@ -101,20 +81,23 @@ public sealed class EditorSession
     }
 
     /// <summary>
-    /// Inserts the template.
+    /// Inserts a section template, with new ids. A page template is invalid and says to apply it instead.
+    /// A template for the other document mode is invalid.
     /// </summary>
-    /// <param name="template">The template.</param>
-    /// <param name="parentId">The parent identifier.</param>
-    /// <param name="slot">The slot.</param>
-    /// <param name="index">The zero-based index.</param>
-    /// <returns>The outcome for the string.</returns>
+    /// <param name="template">The section template.</param>
+    /// <param name="parentId">The block that receives it.</param>
+    /// <param name="slot">The slot name.</param>
+    /// <param name="index">The position in the slot. A value past the end is clamped.</param>
+    /// <returns>The inserted block id, or invalid.</returns>
     public Result<string> InsertTemplate(PageTemplate template, string parentId, string slot, int index)
     {
         string? error = TemplateError(template);
         return error is null ? InsertNode(template.Instantiate(), parentId, slot, index) : Invalid<string>(error);
     }
 
-    /// <summary>Click-to-add: into the selected block when it has a slot, otherwise after it, otherwise at the end of the page.</summary>
+    /// <summary>Click-to-add: into the selected block when it has a slot that can hold the new block, otherwise after it, otherwise at the end of the page.</summary>
+    /// <param name="blockType">The block type key.</param>
+    /// <returns>The new block id, or invalid when the type is unknown or disallowed.</returns>
     public Result<string> InsertNearSelection(string blockType)
     {
         var definition = registry.Find(blockType);
@@ -123,11 +106,9 @@ public sealed class EditorSession
             : InsertNear(definition.Create());
     }
 
-    /// <summary>
-    /// Inserts the template near selection.
-    /// </summary>
-    /// <param name="template">The template.</param>
-    /// <returns>The outcome for the string.</returns>
+    /// <summary>Inserts a section template in the same place as <see cref="InsertNearSelection"/>. A page template or the wrong mode is invalid.</summary>
+    /// <param name="template">The section template.</param>
+    /// <returns>The inserted block id, or invalid.</returns>
     public Result<string> InsertTemplateNearSelection(PageTemplate template)
     {
         string? error = TemplateError(template);
@@ -135,13 +116,14 @@ public sealed class EditorSession
     }
 
     /// <summary>
-    /// Moves the value.
+    /// Moves a block. The page root cannot be moved, and a block cannot be moved inside itself.
+    /// Moving it later in the same slot accounts for the hole it leaves. Dropping it where it already is changes nothing and records no history.
     /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="parentId">The parent identifier.</param>
-    /// <param name="slot">The slot.</param>
-    /// <param name="index">The zero-based index.</param>
-    /// <returns>The result.</returns>
+    /// <param name="id">The block to move.</param>
+    /// <param name="parentId">The block that receives it.</param>
+    /// <param name="slot">The slot name.</param>
+    /// <param name="index">The position in the slot.</param>
+    /// <returns>Success, or invalid when the block cannot go there.</returns>
     public Result Move(string id, string parentId, string slot, int index)
     {
         var location = Document.Locate(id);
@@ -181,12 +163,10 @@ public sealed class EditorSession
         return Result.Success();
     }
 
-    /// <summary>
-    /// Moves by.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="offset">The offset.</param>
-    /// <returns>The result.</returns>
+    /// <summary>Moves a block among its siblings. An offset that does not change its place records no history. The page root cannot be moved.</summary>
+    /// <param name="id">The block to move.</param>
+    /// <param name="offset">How many places to move. Negative moves it earlier.</param>
+    /// <returns>Success, or invalid when the block cannot be moved.</returns>
     public Result MoveBy(string id, int offset)
     {
         var location = Document.Locate(id);
@@ -213,10 +193,11 @@ public sealed class EditorSession
     }
 
     /// <summary>
-    /// Deletes the value.
+    /// Removes a block. The page root cannot be deleted.
+    /// If the deleted block was selected, the selection moves to its parent, or clears when that parent is the page.
     /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <returns>The result.</returns>
+    /// <param name="id">The block to remove.</param>
+    /// <returns>Success, or invalid for the page root.</returns>
     public Result Delete(string id)
     {
         var location = Document.Locate(id);
@@ -234,11 +215,9 @@ public sealed class EditorSession
         return Result.Success();
     }
 
-    /// <summary>
-    /// Duplicates the value.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <returns>The outcome for the string.</returns>
+    /// <summary>Inserts a copy, with new ids, immediately after the block and selects the copy. The page root cannot be duplicated.</summary>
+    /// <param name="id">The block to copy.</param>
+    /// <returns>The copy's id, or invalid for the page root.</returns>
     public Result<string> Duplicate(string id)
     {
         var location = Document.Locate(id);
@@ -254,12 +233,13 @@ public sealed class EditorSession
     }
 
     /// <summary>
-    /// Sets the prop.
+    /// Sets a prop and calls the block's property-changed hook. The same value records no history.
+    /// Edits to the same prop inside the typing window become one undo step.
     /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="value">The value.</param>
-    /// <returns>The prop.</returns>
+    /// <param name="id">The block id.</param>
+    /// <param name="name">The prop name.</param>
+    /// <param name="value">The text to store.</param>
+    /// <returns>Success, or not found when the block is gone.</returns>
     public Result SetProp(string id, string name, string value)
     {
         var node = Document.Find(id);
@@ -283,10 +263,11 @@ public sealed class EditorSession
     }
 
     /// <summary>
-    /// Applies the page template.
+    /// Replaces the whole document with a page template and clears the selection. The change can be undone.
+    /// A section template is invalid, and so is a template for the other document mode.
     /// </summary>
-    /// <param name="template">The template.</param>
-    /// <returns>The page template.</returns>
+    /// <param name="template">The page template.</param>
+    /// <returns>Success, or invalid.</returns>
     public Result ApplyPageTemplate(PageTemplate template)
     {
         if (template.Kind != TemplateKind.Page)
@@ -304,23 +285,17 @@ public sealed class EditorSession
         return Result.Success();
     }
 
-    /// <summary>
-    /// Gets the undo.
-    /// </summary>
-    /// <returns>true when the condition is met; otherwise, false.</returns>
+    /// <summary>Restores the previous document. The selection is cleared when that block is gone.</summary>
+    /// <returns><see langword="true"/> when a snapshot was restored.</returns>
     public bool Undo() => Restore(history.Undo(Snapshot()));
 
-    /// <summary>
-    /// Gets the redo.
-    /// </summary>
-    /// <returns>true when the condition is met; otherwise, false.</returns>
+    /// <summary>Restores the document that was undone. The selection is cleared when that block is gone.</summary>
+    /// <returns><see langword="true"/> when a snapshot was restored.</returns>
     public bool Redo() => Restore(history.Redo(Snapshot()));
 
-    /// <summary>
-    /// Gets the parent identifier.
-    /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <returns>The parent identifier.</returns>
+    /// <summary>The id of the block that contains this one.</summary>
+    /// <param name="id">The block id.</param>
+    /// <returns>The parent id, or <see langword="null"/> for the page root or an unknown id.</returns>
     public string? ParentId(string id) => Document.Locate(id)?.Parent.Id;
 
     private Result<string> InsertNear(BlockNode node)

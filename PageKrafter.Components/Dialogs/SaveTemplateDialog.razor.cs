@@ -1,8 +1,6 @@
 namespace PageKrafter.Components.Dialogs;
 
-/// <summary>
-/// Represents the save template dialog.
-/// </summary>
+/// <summary>Asks for a name, category, and description, then saves the page or the selected section as a template.</summary>
 public partial class SaveTemplateDialog
 {
     private bool open;
@@ -14,9 +12,7 @@ public partial class SaveTemplateDialog
     private string description = string.Empty;
     private string? error;
 
-    /// <summary>
-    /// Gets or sets the editor.
-    /// </summary>
+    /// <summary>The editor that owns the document being saved.</summary>
     [Parameter, EditorRequired]
     public PageKrafterEditor Editor { get; set; } = default!;
 

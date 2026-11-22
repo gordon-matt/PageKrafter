@@ -28,56 +28,40 @@ public abstract class ComponentBlockDefinition<TComponent> : BlockDefinition
     }
 }
 
-/// <summary>
-/// Represents the block component base.
-/// </summary>
+/// <summary>A Razor component that renders one block. The renderer sets <see cref="Context"/> and <see cref="Slots"/> before the component runs.</summary>
 public abstract class BlockComponentBase : ComponentBase
 {
-    /// <summary>
-    /// Gets or sets the context.
-    /// </summary>
+    /// <summary>The block, the document, and the encoding helpers.</summary>
     [Parameter]
     public BlockRenderContext Context { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the slots.
-    /// </summary>
+    /// <summary>Each slot's children, already rendered. The markup is trusted because the renderer produced it.</summary>
     [Parameter]
     public IReadOnlyDictionary<string, MarkupString> Slots { get; set; } = new Dictionary<string, MarkupString>();
 
-    /// <summary>
-    /// Gets a value indicating whether this instance is editor.
-    /// </summary>
+    /// <summary><see langword="true"/> when the HTML is for the canvas.</summary>
     protected bool IsEditor => Context.IsEditor;
 
-    /// <summary>
-    /// Gets a value indicating whether this instance is email.
-    /// </summary>
+    /// <summary><see langword="true"/> only when the document is an email.</summary>
     protected bool IsEmail => Context.IsEmail;
 
-    /// <summary>
-    /// Gets the value.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <returns>The value.</returns>
+    /// <summary>The stored prop, the field default, or an empty string.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <returns>The text.</returns>
     protected string Value(string name) => Context.Value(name);
 
-    /// <summary>
-    /// Gets the slot.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <returns>The slot.</returns>
+    /// <summary>The rendered children of a slot. A missing slot is empty markup.</summary>
+    /// <param name="name">The slot name. The default is the block's main slot.</param>
+    /// <returns>The children's HTML.</returns>
     protected MarkupString Slot(string name = SlotDefinition.Default) => Slots.TryGetValue(name, out var html) ? html : default;
 
     /// <summary>Spread onto the element that holds a slot: <c>&lt;div @attributes="SlotAttributes()"&gt;@Slot()&lt;/div&gt;</c>.</summary>
     protected IReadOnlyDictionary<string, object> SlotAttributes(string name = SlotDefinition.Default) => Context.SlotAttributeMap(name);
 
-    /// <summary>
-    /// Gets the editable.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <param name="rich">The rich.</param>
-    /// <returns>The editable.</returns>
+    /// <summary>Attributes that let the canvas edit this element in place. Empty in exported HTML.</summary>
+    /// <param name="name">The prop name.</param>
+    /// <param name="rich"><see langword="true"/> marks the field as rich text.</param>
+    /// <returns>The attributes to spread onto the element.</returns>
     protected IReadOnlyDictionary<string, object> Editable(string name, bool rich = false) => Context.EditableAttributeMap(name, rich);
 }
 
@@ -86,12 +70,10 @@ public sealed class BlockComponentRenderer(IServiceProvider services, ILoggerFac
 {
     private HtmlRenderer? renderer;
 
-    /// <summary>
-    /// Renders the value.
-    /// </summary>
-    /// <param name="componentType">The component type.</param>
-    /// <param name="parameters">The parameters.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the string.</returns>
+    /// <summary>Renders one block component to an HTML string. The same renderer is reused for later blocks in the scope.</summary>
+    /// <param name="componentType">The component to render.</param>
+    /// <param name="parameters">The parameter values, including the context and the slots.</param>
+    /// <returns>The component's HTML.</returns>
     public async Task<string> RenderAsync(Type componentType, IDictionary<string, object?> parameters)
     {
         renderer ??= new HtmlRenderer(services, loggerFactory);

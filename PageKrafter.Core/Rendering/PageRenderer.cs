@@ -1,13 +1,19 @@
 namespace PageKrafter.Rendering;
 
 /// <summary>
-/// Represents the page renderer.
+/// Turns a document into HTML. An unknown block, or a block that does not include the document mode, is omitted from exported HTML and shown as a placeholder in the editor.
+/// A block that throws is a placeholder in the editor. Cancellation is not caught. Nesting deeper than 48 levels renders nothing.
+/// Common styles and editor attributes are written onto the block's first element. Editor HTML that does not start with an element is wrapped in a <c>div</c>.
 /// </summary>
 public sealed class PageRenderer(BlockRegistry registry, IHtmlContentSanitizer sanitizer, IServiceProvider services)
 {
     private const int MaxDepth = 48;
 
-    /// <summary>Renders the page body. Store this in a CMS field, or render it in a host page.</summary>
+    /// <summary>Renders the page body. Store this in a CMS field, or render it in a host page. A null <paramref name="options"/> uses <see cref="RenderOptions.Export"/>.</summary>
+    /// <param name="document">The document.</param>
+    /// <param name="options">Export or editor options. <see langword="null"/> means export.</param>
+    /// <param name="cancellationToken">Cancels rendering. A cancelled block is not turned into a placeholder.</param>
+    /// <returns>The body HTML.</returns>
     public async Task<string> RenderAsync(PageDocument document, RenderOptions? options = null, CancellationToken cancellationToken = default)
     {
         options ??= RenderOptions.Export;
@@ -15,7 +21,14 @@ public sealed class PageRenderer(BlockRegistry registry, IHtmlContentSanitizer s
         return options.IncludeBaseStyles ? $"<style>{BaseStyles.For(document.Mode)}</style>{body}" : body;
     }
 
-    /// <summary>Renders a complete HTML document, which is what an email send or a standalone page needs.</summary>
+    /// <summary>
+    /// Renders a complete HTML document, which is what an email send or a standalone page needs.
+    /// Base styles go in the head, the title is encoded, and an email adds the compatibility meta tags.
+    /// </summary>
+    /// <param name="document">The document.</param>
+    /// <param name="title">The document title. The default is empty.</param>
+    /// <param name="cancellationToken">Cancels rendering.</param>
+    /// <returns>The document, including the doctype.</returns>
     public async Task<string> RenderDocumentAsync(PageDocument document, string title = "", CancellationToken cancellationToken = default)
     {
         string body = await RenderAsync(document, RenderOptions.Export with { IncludeBaseStyles = false }, cancellationToken);
