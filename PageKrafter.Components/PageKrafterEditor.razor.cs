@@ -518,7 +518,10 @@ public partial class PageKrafterEditor
 
         string body = await RenderCanvasAsync();
         var styles = Options.Value.CanvasStyles.Concat(CanvasStyles ?? []);
-        string document = CanvasDocument.Build(body, Session.Document.Mode, Navigation.BaseUri, styles, Options.Value.CanvasHeadHtml);
+        // The site root, not the document base. A library mounted at /admin/email/ has a base href
+        // there, and the canvas must still resolve images and styles from the host site.
+        string siteRoot = Navigation.ToAbsoluteUri("/").AbsoluteUri;
+        string document = CanvasDocument.Build(body, Session.Document.Mode, siteRoot, styles, Options.Value.CanvasHeadHtml);
         await module.InvokeVoidAsync("load", frame, document, Session.SelectedId, preview);
     }
 

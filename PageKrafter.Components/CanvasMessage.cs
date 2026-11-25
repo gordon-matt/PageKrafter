@@ -39,7 +39,9 @@ public sealed record CanvasMessage
 
 internal static class CanvasDocument
 {
-    private const string AssetRoot = "_content/PageKrafter.Components/";
+    // Root-absolute. A host document whose base href is a mount path, such as /admin/email/,
+    // would otherwise request these files under that path and the editor would render unstyled.
+    private const string AssetRoot = "/_content/PageKrafter.Components/";
 
     // Bumped when the editor assets change, so a browser does not keep an older stylesheet at the same address.
     private static readonly string AssetVersion = typeof(CanvasDocument).Assembly.GetName().Version?.ToString() ?? "1";
@@ -77,7 +79,7 @@ internal static class CanvasDocument
             """;
     }
 
-    public static string ModuleUrl => $"./{AssetRoot}pagekrafter.js?v={AssetVersion}";
+    public static string ModuleUrl => $"{AssetRoot}pagekrafter.js?v={AssetVersion}";
 
     public static string StylesheetUrl => $"{AssetRoot}pagekrafter.css?v={AssetVersion}";
 }
